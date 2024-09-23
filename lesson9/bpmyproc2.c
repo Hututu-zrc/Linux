@@ -11,11 +11,21 @@ int main()
 	//printf("PPID:%d\n",getppid());
 	
 
-	//pid_t id= fork();
+	pid_t id= fork();
 	while(1)
 	{
-		printf("hello world\n");
-		sleep(1);
+		if(id>0)
+		{
+			printf("this is Father Process:  PID:%d   PPID:%d   ID:%d  \n",getpid(),getppid(),id);
+			sleep(1);
+		}
+		else if (id==0)
+		{
+			printf("this is Son Process:  PID:%d   PPID:%d   ID:%d  \n",getpid(),getppid(),id);
+			sleep(1);
+	   	
+		}
+		printf("\n");
 	}
 	//while(1)
 	//{
