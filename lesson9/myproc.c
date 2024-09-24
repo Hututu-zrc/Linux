@@ -12,6 +12,7 @@ int main()
 	
 
 	//pid_t id= fork();
+	//int cnt=10;
 	while(1)
 	{
 		printf("hello world\n");
