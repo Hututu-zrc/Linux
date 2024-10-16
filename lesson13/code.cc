@@ -10,16 +10,20 @@
 using namespace std;
 vector<int> data;
 
+enum{
+	OK=0,
+	ERR_FILE_OPEN
+};
 
-
-void Save()
+int  Save()
 {
 	string name =to_string(time(NULL));
 	name+=".backup";
 	FILE * fp=fopen(name.c_str(),"w");
 	if(fp==nullptr)
 	{
-		perror("file open");
+		//perror("file open");
+		return ERR_FILE_OPEN;
 	}
 	else
 	{
@@ -32,8 +36,7 @@ void Save()
 
 	}
 	fclose(fp);
-	printf("BackUp is over!\n");
-
+	return OK;
 }
 
 int main()
@@ -43,30 +46,41 @@ int main()
 	{
 		data.push_back(cnt);
 		cnt+=2;
-		pid_t id =fork();
-		if(id<0)
+		if(cnt%10==0)
 		{
-			perror("fork");
-		}
-		else if(id==0)
-		{
-			printf("sub process success,pid:%d\n",getpid());
-			Save();
-			exit(0);
-			sleep(2);
-		}
-		else
-		{
-			int status=0;
-			pid_t rid=waitpid(id,&status,0);
-			if(WIFEXITED(status))
-				printf("sub process exit success !pid : %d\n",rid);
+			pid_t id =fork();
+			if(id<0)
+			{
+				perror("fork");
+			}
+			else if(id==0)
+			{
+				//改进地方：可以对save函数加一个返回参数来判断是否备份成功
+				printf("sub process success,pid:%d\n",getpid());
+				int code=Save();
+				exit(code);
+				//sleep(2);
+			}
 			else
-				perror("sub process exit false !\n");
+			{
+				int status=0;
+				pid_t rid=waitpid(id,&status,0);
+				if(WIFEXITED(status))
+				{
+					printf("BackUp is over!\n");
+				}
+				else
+				{
+					
+					printf("BackUp is errornous!\n");
+				}
 
-			printf("father process success,pid:%d\n",getpid());
-			sleep(2);
+				printf("father process success,pid:%d\n\n",getpid());
+				sleep(2);
+			}
 		}
+	
+			
 	}
 	return 0;
 }
