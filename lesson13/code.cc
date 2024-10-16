@@ -6,82 +6,65 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <vector>
-
+#include <functional>
+#include "task.h"
 using namespace std;
-vector<int> data;
 
-enum{
-	OK=0,
-	ERR_FILE_OPEN
-};
+typedef function<void()> task_t;
 
-int  Save()
+void Task(vector<task_t> & task)
 {
-	string name =to_string(time(NULL));
-	name+=".backup";
-	FILE * fp=fopen(name.c_str(),"w");
-	if(fp==nullptr)
-	{
-		//perror("file open");
-		return ERR_FILE_OPEN;
-	}
-	else
-	{
-		for(const auto & e:data)
-		{
-			fputs(to_string(e).c_str(),fp);
-			fputs(" ",fp);
-		}
-
-
-	}
-	fclose(fp);
-	return OK;
+	task.push_back(PrintLog);
+	task.push_back(Download);
+	task.push_back(Backup);
 }
-
 int main()
 {
-	int cnt=0;
-	while(true)
+	pid_t id =fork();
+	if(id<0)
 	{
-		data.push_back(cnt);
-		cnt+=2;
-		if(cnt%10==0)
+		perror("fork");
+	}
+	else if(id==0)
+	{
+		int cnt=0;
+		while(cnt!=5)
+		{	cnt++;
+			printf("sub process create success,pid:%d\n",getpid());
+			sleep(1);
+		}
+		exit(0);
+	}
+	else 
+	{
+		while(true)
 		{
-			pid_t id =fork();
-			if(id<0)
+			sleep(1);
+			pid_t rid =waitpid(id,nullptr,WNOHANG);
+			if(rid<0)
 			{
-				perror("fork");
+				printf("wait failure!\n");
+				break;
 			}
-			else if(id==0)
+			else if(rid>0)
 			{
-				//改进地方：可以对save函数加一个返回参数来判断是否备份成功
-				printf("sub process success,pid:%d\n",getpid());
-				int code=Save();
-				exit(code);
-				//sleep(2);
+				printf("wait is over,pid:%d\n",rid);
+				break;
 			}
-			else
+			else 
 			{
-				int status=0;
-				pid_t rid=waitpid(id,&status,0);
-				if(WIFEXITED(status))
+				printf("waitting!\n");	
+				vector<task_t> task;
+				Task(task);
+				for(auto &e:task)
 				{
-					printf("BackUp is over!\n");
+					e();
 				}
-				else
-				{
-					
-					printf("BackUp is errornous!\n");
-				}
+				printf("\n");
 
-				printf("father process success,pid:%d\n\n",getpid());
-				sleep(2);
 			}
 		}
-	
-			
+
 	}
 	return 0;
 }
-
