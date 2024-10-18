@@ -21,11 +21,12 @@ int main()
 			printf("sub process successed and pid:%d\n",getpid());
 			sleep(2);
 		}
-		exit(0);
+		exit(100);
 	}
 	else
 	{
-		pid_t rid=wait(nullptr);
+		int status=0;
+		pid_t rid=waitpid(-1,&status,0);
 		if(rid<0)
 		{
 			perror("wait");
@@ -33,6 +34,14 @@ int main()
 		else
 		{
 			printf("sub process exit success, pid:%d\n",rid);
+			//printf("status :%d\n",status>>8 & 0xFF);
+			if(WIFEXITED(status))
+			{
+			
+				printf("sub process exit code : %d\n",WEXITSTATUS(status));
+				printf("rid:%d\n",rid);
+
+			}
 		}
 		while(true)
 		{
