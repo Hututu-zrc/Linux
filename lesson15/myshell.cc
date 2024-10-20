@@ -16,7 +16,7 @@ const int basesize=1024;
 const int envnum=64;
 const int argvnum=64;
 const int existenvnum=0;
-
+int lastcode=-1;//错误码返回值echo
 
 //命令行参数
 char * gargv[argvnum];
@@ -206,11 +206,12 @@ bool ExecuteCommandLine()
 	if(id<0)
 	{
 		perror("fork");
+		lastcode=99;
 		return false;
 	}
 	else if (id==0)
 	{
-		execvp(gargv[0],gargv);
+		execvpe(gargv[0],gargv,genv);
 		//这里会发生程序替换，只要子进程有返回值exit返回
 		//就证明这里出了问题
 		exit(1);
@@ -219,6 +220,16 @@ bool ExecuteCommandLine()
 	pid_t rid=waitpid(id,&status,0);
 	if(rid>0)
 	{
+		if(WIFEXITED(status))
+		{	
+			//子进程运行成功
+			lastcode=WEXITSTATUS(status);	
+		}
+		else
+		{
+			//子进程运行失败
+			lastcode=100;
+		}
 		return true;
 	}
 	return false;
@@ -233,7 +244,11 @@ bool CheckAndExecBulidCommand()
 		if(gargc==2)
 		{
 			chdir(gargv[1]);
-
+			lastcode=0;
+		}
+		else
+		{
+			lastcode=1;
 		}
 		return true;
 	}
@@ -243,8 +258,12 @@ bool CheckAndExecBulidCommand()
 		if(gargc==2)
 		{	
 			AddEnv(gargv[1]);		
-
+			lastcode=0;
 		}	
+		else
+		{
+			lastcode=2;
+		}
 		return true;
 	}
 	else if(strcmp(gargv[0],"env")==0)
@@ -253,6 +272,64 @@ bool CheckAndExecBulidCommand()
 		{
 			printf("%s\n",genv[i]);	
 		
+		}
+		lastcode=0;
+		return true;
+	}
+	else if(strcmp(gargv[0],"echo")==0)
+	{
+		//echo $?
+		//echo $PATH
+		//echo 字符串
+		if(gargc==2)
+		{
+			if(gargv[1][0]=='$')
+			{
+				if(gargv[1][1]=='?')
+				{
+					printf("%d\n",lastcode);
+					lastcode=0;
+				}
+				else
+				{	//取出$之后的字符
+					string name=gargv[1];
+					int pos=name.find_last_of("$");
+					name=name.substr(pos+1,name.size()-pos);
+					
+					//开始与环境表中对比
+					for(int i=0;genv[i];++i)
+					{
+						string bname=genv[i];
+						string hname;
+						int bpos=bname.find_first_of("=");
+						hname=bname.substr(pos,bname.size()-pos);
+						bname=bname.substr(0,bpos);
+						if(strcmp(name.c_str(),bname.c_str())==0)
+						{	
+							printf("%s\n",hname.c_str());
+							lastcode=0;
+							break;
+						}
+					}
+
+					if(lastcode!=0)
+					{
+						printf("\n");
+						lastcode=5;
+					}
+				}
+
+			}
+			else
+			{
+				printf("%s\n",gargv[1]);
+				lastcode=0;
+			}
+			
+		}
+		else 
+		{
+			lastcode=3;
 		}
 		return true;
 	}
@@ -300,7 +377,8 @@ int main()
 		//如此一来，达不到我们的要求，我们需要对这些内建命令单独处理
 		if(CheckAndExecBulidCommand())
 			continue;
-
+		//我们这里为了将echo当作内建命令
+		//为了echo返回错误码的功能，其余内建命令也要有lastcode值
 
 		
 		//4.执行命令行
