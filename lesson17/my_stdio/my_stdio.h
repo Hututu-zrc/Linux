@@ -24,5 +24,6 @@ file*  mfopen(const char *path, const char *mode);
 size_t mfwrite(const void *ptr, size_t size, file *stream);
 void mfflush(file* stream);
 size_t mfread(void *ptr, size_t size, file *stream) ;
+void mfclose(file *stream);
 
 
