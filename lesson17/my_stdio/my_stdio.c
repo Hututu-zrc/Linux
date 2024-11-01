@@ -64,6 +64,10 @@ size_t mfread(void *ptr, size_t size, file *stream);
 
 void mfclose(file *stream)
 {
+	if(stream->size>0)
+	{
+		mfflush(stream);
+	}
 	close(stream->fileno);
 }
 int main()
