@@ -133,16 +133,25 @@ bool GetCommandLine(char commandbuffer[])
 
 }
 
-void PraseCommandLine(char commandbuffer[],int len)
+void InitValue()
 {
-	
-	printf("before comandbuffer : %s\n",commandbuffer);
+
 	//重定向判断符号复原
 	Redir=-1;
 	filename=NULL;
+
+	//每次分析字符串，将我们的gargc,gargv复原
+	memset(gargv,0,sizeof(gargv));
+	gargc=0;
+}
+
+void IsRedir(char commandbuffer[],int len)
+{
+
+	//printf("before comandbuffer : %s\n",commandbuffer);
 	//判断里面是否含有重定向操作
 	int end=len-1;//下标
-	printf("end:%d\n",end);
+	//printf("end:%d\n",end);
 	while(end>0)
 	{	
 		if(commandbuffer[end]=='<')//输入重定向 后面的文件作为输入内容
@@ -159,7 +168,7 @@ void PraseCommandLine(char commandbuffer[],int len)
 			{
 				
 				commandbuffer[end-1]=0;
-				filename=&commandbuffer[end]+1;//这里直接拿到的就是<后面的一个地址
+				filename=&commandbuffer[end]+1;//这里直接拿到的就是>后面的一个地址
 				TrimBlankSpace(filename);
 				Redir=AppendRedir;
 				break;
@@ -167,7 +176,7 @@ void PraseCommandLine(char commandbuffer[],int len)
 			else
 			{
 				commandbuffer[end]=0;
-				filename=&commandbuffer[end]+1;//这里直接拿到的就是<后面的一个地址
+				filename=&commandbuffer[end]+1;//这里直接拿到的就是>后面的一个地址
 				TrimBlankSpace(filename);
 				Redir=OutputRedir;
 				break;
@@ -179,18 +188,28 @@ void PraseCommandLine(char commandbuffer[],int len)
 	{
 		Redir=NoneRedir;
 	}
-	
-	printf("after comandbuffer : %s\n",commandbuffer);
-	printf("Redir:%d\n",Redir);
-	printf("filename:%s\n",filename);
+}
+
+void SplitCommand(char commandbuffer[])
+{
+
 	//这里我们采用的是C语言的strtok
-	//每次分析字符串，将我们的gargc,gargv复原
-	memset(gargv,0,sizeof(gargv));
-	gargc=0;
 	
 	gargv[gargc++]=strtok(commandbuffer,sep);
 	while((bool)(gargv[gargc++]=strtok(NULL,sep)));
 	--gargc;	
+}
+
+void PraseCommandLine(char commandbuffer[],int len)
+{
+	InitValue();
+	IsRedir(commandbuffer,len);//判断是否存在重定向
+	SplitCommand(commandbuffer);
+
+
+	//printf("after comandbuffer : %s\n",commandbuffer);
+	//printf("Redir:%d\n",Redir);
+	//printf("filename:%s\n",filename);
 }	
 
 void debug()
@@ -264,6 +283,26 @@ void debugenv()
 	}
 }
 
+void ExeRedir()
+{
+	
+		if(Redir==InputRedir)
+		{
+			int fd=open(filename,O_RDONLY);
+			dup2(fd,0);
+		}
+		else if(Redir==OutputRedir)
+		{
+			int fd=open(filename,O_WRONLY | O_CREAT | O_TRUNC,0666);
+			dup2(fd,1);
+		}
+		else if(Redir==AppendRedir)
+		{
+			int fd=open(filename,O_WRONLY | O_CREAT | O_APPEND);
+			dup2(fd,1);
+		}
+}
+
 bool ExecuteCommandLine()
 {
 	pid_t id=fork();
@@ -274,7 +313,9 @@ bool ExecuteCommandLine()
 		return false;
 	}
 	else if (id==0)
-	{
+	{	
+		//开始判断重定向
+		ExeRedir();
 		execvpe(gargv[0],gargv,genv);
 		//这里会发生程序替换，只要子进程有返回值exit返回
 		//就证明这里出了问题
@@ -450,6 +491,7 @@ int main()
 		//如果自己去执行命令，那么如果出问题，shell外壳直接就挂掉了
 		//所以，我们使用多进程，使用子进程去执行命令，
 		//子进程发生进程替换后，后找到对应的执行程序执行命令
+		//我们这里的重定向不考虑内建命令
 		ExecuteCommandLine();
 
 	}
