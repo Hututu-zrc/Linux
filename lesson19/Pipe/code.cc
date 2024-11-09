@@ -6,6 +6,8 @@
 #include <sys/wait.h>
 int main()
 {
+    std::cout << "Test Git" << std::endl;
+    std::cout.flush();
     int fds[2] = {0}; // 读写操作,fds[0]是读操作，fds[1]是写操作
     int n = pipe(fds);
     if (n != 0)
@@ -73,5 +75,6 @@ int main()
             std::cout << "wait success" << std::endl;
         }
     }
+
     return 0;
 }
