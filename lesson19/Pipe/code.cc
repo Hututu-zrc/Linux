@@ -31,7 +31,7 @@ int main()
         ::close(fds[0]);
         int cnt = 0;
 
-        while (true)
+        while (cnt <10)
         {
             std::string str = "hello";
             str += ",cnt: ";
@@ -64,15 +64,33 @@ int main()
                 std::cout << "child -> father : " << buf << std::endl;
             }
         }
-        int rid = ::waitpid(pid, nullptr, 0);
+        int status = 0;
+        int rid = ::waitpid(pid, &status, 0);
         if (rid < 0)
         {
-            perror("waitpid");
+            std::cerr<<"waitpid failed"<<std::endl;
             exit(1);
         }
         else
         {
             std::cout << "wait success" << std::endl;
+            if (WIFEXITED(status))
+            {
+                std::cout << "sub process exit code :" << WEXITSTATUS(status) << std::endl;
+            }
+            else 
+            {
+                std::cerr<<"sub process exit abnormally "<<std::endl;
+            }
+
+             if (WIFSIGNALED(status))
+            {
+                std::cout << "sub process  signal code  :" << WTERMSIG(status) << std::endl;
+            }
+            else 
+            {
+                std::cerr<<"sub process did not terminate by signal "<<std::endl;
+            }
         }
     }
 
