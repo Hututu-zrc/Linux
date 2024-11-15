@@ -27,7 +27,7 @@ $(BIN):$(OBJ)
 	$(CC) $(FLAGS) $<
 
 
-.PHONEY:clean
+.PHONY:clean
 clean:
 	rm -f $(BIN) $(OBJ)
 
