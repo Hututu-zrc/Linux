@@ -1,6 +1,6 @@
 #include <iostream>
 #include "SharedMemory.hpp"
-
+#include "Time.hpp"
 
 //这里不能每个程序都是自己的shm
 //这样就看不到同一份资源了
@@ -9,6 +9,18 @@ int main()
     SharedMemory shm;
     shm.CreateShm();
     shm.AttachShm();
+
+    //开始传输文件
+    char * str=(char *)shm.GetAddress();
+    while(true)
+    {
+        printf("%s      ",str);
+        printf("%s\n",GetCurTime().c_str());
+        sleep(1);
+    }
+
+
+
     shm.DetachShm();
     shm.DestroyShm();
     return 0;

@@ -1,11 +1,25 @@
 #include <iostream>
 #include "SharedMemory.hpp"
-
+#include <string.h>
 int main()
 {
     SharedMemory shm;
     shm.GetShm();
     shm.AttachShm();
+    
+    //开始传输文件
+    char * str=(char*)shm.GetAddress();
+    char alp='A';
+    std::string message;
+    while(alp<='Z')
+    {
+        message+=alp;
+        strcpy(str,message.c_str());
+        sleep(3);
+        alp+=1;
+    }
+
+    
     shm.DetachShm();
     shm.DestroyShm();
     return 0;
