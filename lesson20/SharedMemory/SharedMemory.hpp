@@ -96,7 +96,10 @@ public:
             std::cerr << "shmctl" << endl;
         }
     }
-
+    void * GetAddress()
+    {
+        return _shmaddr;
+    }
     ~SharedMemory()
     {
     }
