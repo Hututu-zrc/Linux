@@ -9,22 +9,68 @@ using std::endl;
 
 void Handler(int signo)
 {
-    cout << "signo:" << signo << endl;
-    cout << "receive signo!" << endl;
+
 }
 int main()
 {
-    // int cnt = 10;
-
-    int b=10;
-    b/=0;
-    signal(SIGFPE, Handler);
-    while (true)
+    sigset_t pset;
+    ::sigemptyset(&pset);
+    int n=::sigpending(&pset);
+    if(n<0)
     {
-
+        cerr<<"sigpending"<<endl;
+        exit(1);
+    }
+    while(true)
+    {
+        cout<<"curr pending list [" <<getpid()<<"]:";
+        for(int i=1;i<=31;i++)
+        {
+            int ret=::sigismember(&pset,i);
+            if(ret==1)
+                cout<<1;
+            else if(ret==0)
+                cout<<0;
+            else
+                cerr<<"sigismember"<<endl;
+        }
+        cout<<endl;
+        sleep(1);
     }
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// void Handler(int signo)
+// {
+//     cout << "signo:" << signo << endl;
+//     cout << "receive signo!" << endl;
+// }
+// int main()
+// {
+//     // int cnt = 10;
+
+//     int b=10;
+//     b/=0;
+//     signal(SIGFPE, Handler);
+//     while (true)
+//     {
+
+//     }
+//     return 0;
+// }
 
 // void Handler(int signo)
 // {
