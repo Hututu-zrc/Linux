@@ -17,6 +17,7 @@ int main()
 {
 
     // 首先将block信号集里面的2号信号进行屏蔽
+    //这里我们是在栈上开辟的数据，可能会有数据在里面，首先需要清空一下
     sigset_t bset, obset;
     ::sigemptyset(&bset);
     ::sigemptyset(&obset);
@@ -52,7 +53,7 @@ int main()
         }
         cout << endl;
         sleep(1);
-        
+
         if((cnt--)==0)
         {
             sigprocmask(SIG_SETMASK, &obset, nullptr);
@@ -61,22 +62,22 @@ int main()
     return 0;
 }
 
-// void Handler(int signo)
+// void sigcb(int signo)
 // {
 //     cout << "signo:" << signo << endl;
-//     cout << "receive signo!" << endl;
+//     // cout << "receive signo!" << endl;
 // }
 // int main()
 // {
 //     // int cnt = 10;
-
-//     int b=10;
-//     b/=0;
-//     signal(SIGFPE, Handler);
+//     cout << "PID:" << getpid() << endl;
+//     signal(SIGINT, sigcb);
 //     while (true)
 //     {
-
+//         cout << "running..." << endl;
+//         sleep(1);
 //     }
+
 //     return 0;
 // }
 
