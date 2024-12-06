@@ -7,69 +7,137 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-void PrintPending()
+
+void sigcb(int signo )
 {
+    cout<<"signo:"<<signo<<endl;
+    sleep(1);
+    exit(0);
+}
+
+
+int  main()
+{
+    cout<<"PID: "<<getpid()<<endl;
+    struct sigaction sa;
+    sa.sa_handler=sigcb;
+
     sigset_t set;
-    sigemptyset(&set);
-    sigpending(&set);
-    cout << "cur pending :";
-    for (int i = 31; i >= 1; i--)
-    {
-        if (sigismember(&set, i) == 1)
-            cout << 1;
-        else
-            cout << 0;
-    }
-    cout << endl;
-}
-void PrintBlock()
-{
-    sigset_t set;
-    sigemptyset(&set);
-    sigprocmask(SIG_BLOCK,nullptr,&set);
-    cout << "cur block :";
-    for (int i = 31; i >= 1; i--)
-    {
-        if (sigismember(&set, i) == 1)
-            cout << 1;
-        else
-            cout << 0;
-    }
-    cout << endl;
-}
-void Handler(int signo)
-{
-    cout << "signo: " << signo << endl;
-    PrintBlock();
-}
-int main()
-{
-    sigset_t set, oset;
     ::sigemptyset(&set);
-    ::sigemptyset(&oset);
-    sigaddset(&set,3);
-    sigprocmask(SIG_BLOCK,&set,nullptr);
 
-    // C++里面struct也是类，struct可写可不写，
-    // 但是为了可读性，我们写上struct
-    struct sigaction sa, osa;
-    sa.sa_handler = Handler;
-    sa.sa_flags = 0;
-    sa.sa_mask = set;
-    
-    osa = sa;
-    ::sigaction(SIGINT, &sa, &osa);
-    cout<<"PID :"<<getpid()<<endl;
-    PrintPending();
-    while (true)
+    sa.sa_mask=set;
+    ::sigaction(SIGINT,&sa,nullptr);
+    while(true)
     {
-        PrintBlock();
-        //pause();
-        sleep(2);
+        cout<<"running"<<endl;
+        sleep(1);
     }
-
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// long long  cnt = 0;
+// void Handler(int signo)
+// {
+//     cout<<"signo:"<<signo<<endl;
+//     //这里可以是3021601220
+//     cout << "cnt:" << cnt << endl;
+
+//     exit(0);
+// }
+// int main()
+// {
+//     alarm(1);
+//     signal(SIGALRM,Handler);
+    
+//     while (true)
+//     {
+//         ++cnt;
+//         //这里的IO严重拖延了效率，cnt只能是47000多
+//         //cout << "cnt:" << cnt << endl;
+//     }
+//     return 0;
+// }
+
+// void PrintPending()
+// {
+//     sigset_t set;
+//     sigemptyset(&set);
+//     sigpending(&set);
+//     cout << "cur pending :";
+//     for (int i = 31; i >= 1; i--)
+//     {
+//         if (sigismember(&set, i) == 1)
+//             cout << 1;
+//         else
+//             cout << 0;
+//     }
+//     cout << endl;
+// }
+// void PrintBlock()
+// {
+//     sigset_t set;
+//     sigemptyset(&set);
+//     sigprocmask(SIG_BLOCK, nullptr, &set);
+//     cout << "cur block :";
+//     for (int i = 31; i >= 1; i--)
+//     {
+//         if (sigismember(&set, i) == 1)
+//             cout << 1;
+//         else
+//             cout << 0;
+//     }
+//     cout << endl;
+// }
+// void Handler(int signo)
+// {
+//     cout << "signo: " << signo << endl;
+//     PrintBlock();
+// }
+// int main()
+// {
+//     sigset_t set, oset;
+//     ::sigemptyset(&set);
+//     ::sigemptyset(&oset);
+//     sigaddset(&set, 3);
+//     sigprocmask(SIG_BLOCK, &set, nullptr);
+
+//     // C++里面struct也是类，struct可写可不写，
+//     // 但是为了可读性，我们写上struct
+//     struct sigaction sa, osa;
+//     sa.sa_handler = Handler;
+//     sa.sa_flags = 0;
+//     sa.sa_mask = set;
+
+//     osa = sa;
+//     ::sigaction(SIGINT, &sa, &osa);
+//     cout << "PID :" << getpid() << endl;
+//     PrintPending();
+//     while (true)
+//     {
+//         PrintBlock();
+//         // pause();
+//         sleep(2);
+//     }
+
+//     return 0;
+// }
 
 // void Handler(int signo)
 // {
