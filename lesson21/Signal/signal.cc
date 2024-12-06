@@ -1,56 +1,111 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <signal.h>
 
 using std::cerr;
 using std::cout;
 using std::endl;
 
-
-void sigcb(int signo )
+void Handler(int signo)
 {
-    cout<<"signo:"<<signo<<endl;
-    sleep(1);
-    exit(0);
-}
-
-
-int  main()
-{
-    cout<<"PID: "<<getpid()<<endl;
-    struct sigaction sa;
-    sa.sa_handler=sigcb;
-
-    sigset_t set;
-    ::sigemptyset(&set);
-
-    sa.sa_mask=set;
-    ::sigaction(SIGINT,&sa,nullptr);
+    cout<<"signo: "<<signo<<endl;
     while(true)
     {
-        cout<<"running"<<endl;
+        int rid=waitpid(-1,nullptr,WNOHANG);
+        if(rid<0)
+        {
+            cerr<<"waitpid error"<<endl;
+            break;
+        }
+        else if(rid>0)
+        {
+            cout<<"subprocess is recycled."<<endl;
+            break;
+        }
+        else 
+        {
+            cout<<"there is no subprocess."<<endl;
+            break;
+        }
+
+    }
+}
+int main()
+{
+    signal(SIGCHLD, Handler);
+    for (int i = 0; i < 5; i++)
+    {
+        if (fork() == 0)
+        {
+            cout << "i am subprocess,pid: " << getpid() << endl;
+            exit(0);
+        }
+    }
+    
+    while (true)
+    {
+        //cout << "i am fatherprocess,pid: " << getpid() << endl;
         sleep(1);
     }
+    
+    //
+    // if (::fork() == 0)
+    // {
+    //     while (true)
+    //     {
+    //         cout << "i am subprocess,pid: " << getpid() << endl;
+    //         sleep(1);
+    //     }
+    //     exit(0);
+    // }
+    // signal(SIGCHLD,Handler);
+    // 这里的父进程每次都要阻塞式的等待子进程进行完毕
+    // 或者是waitpid采用不阻塞的方式，但是OS每次要轮询访问子进程，看子进程有没有退出
+    //  pid_t rid = ::waitpid(-1, nullptr, WNOHANG);
+    //  if (rid < 0)
+    //  {
+    //      cerr << "waitpid failure." << endl;
+    //      exit(1);
+    //  }
+    //  else if(rid>0)
+    //  {
+    //      cout<<"subprocess exit succussfully!"<<endl;
+    //  }
+    //  else
+    //  {
+    //      cout<<"no subprocess is over!"<<endl;
+    //  }
+
     return 0;
 }
 
+// void sigcb(int signo )
+// {
+//     cout<<"signo:"<<signo<<endl;
+//     sleep(1);
+//     exit(0);
+// }
 
+// int  main()
+// {
+//     cout<<"PID: "<<getpid()<<endl;
+//     struct sigaction sa;
+//     sa.sa_handler=sigcb;
 
+//     sigset_t set;
+//     ::sigemptyset(&set);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//     sa.sa_mask=set;
+//     ::sigaction(SIGINT,&sa,nullptr);
+//     while(true)
+//     {
+//         cout<<"running"<<endl;
+//         sleep(1);
+//     }
+//     return 0;
+// }
 
 // long long  cnt = 0;
 // void Handler(int signo)
@@ -65,7 +120,7 @@ int  main()
 // {
 //     alarm(1);
 //     signal(SIGALRM,Handler);
-    
+
 //     while (true)
 //     {
 //         ++cnt;
