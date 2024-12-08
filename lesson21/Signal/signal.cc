@@ -8,78 +8,95 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-void Handler(int signo)
-{
-    cout<<"signo: "<<signo<<endl;
-    while(true)
-    {
-        int rid=waitpid(-1,nullptr,WNOHANG);
-        if(rid<0)
-        {
-            cerr<<"waitpid error"<<endl;
-            break;
-        }
-        else if(rid>0)
-        {
-            cout<<"subprocess is recycled."<<endl;
-            break;
-        }
-        else 
-        {
-            cout<<"there is no subprocess."<<endl;
-            break;
-        }
-
-    }
-}
 int main()
 {
-    signal(SIGCHLD, Handler);
-    for (int i = 0; i < 5; i++)
-    {
-        if (fork() == 0)
-        {
-            cout << "i am subprocess,pid: " << getpid() << endl;
-            exit(0);
-        }
-    }
-    
+    sigset_t set, oset;
+    sigaddset(&set, 2);
+    sigaddset(&set, 40);
+    sigprocmask(SIG_BLOCK,&set,&oset);
+
+    cout<<"PID: "<<getpid()<<endl;
     while (true)
     {
-        //cout << "i am fatherprocess,pid: " << getpid() << endl;
-        sleep(1);
+        pause();
     }
-    
-    //
-    // if (::fork() == 0)
-    // {
-    //     while (true)
-    //     {
-    //         cout << "i am subprocess,pid: " << getpid() << endl;
-    //         sleep(1);
-    //     }
-    //     exit(0);
-    // }
-    // signal(SIGCHLD,Handler);
-    // 这里的父进程每次都要阻塞式的等待子进程进行完毕
-    // 或者是waitpid采用不阻塞的方式，但是OS每次要轮询访问子进程，看子进程有没有退出
-    //  pid_t rid = ::waitpid(-1, nullptr, WNOHANG);
-    //  if (rid < 0)
-    //  {
-    //      cerr << "waitpid failure." << endl;
-    //      exit(1);
-    //  }
-    //  else if(rid>0)
-    //  {
-    //      cout<<"subprocess exit succussfully!"<<endl;
-    //  }
-    //  else
-    //  {
-    //      cout<<"no subprocess is over!"<<endl;
-    //  }
-
     return 0;
 }
+
+// void Handler(int signo)
+// {
+//     cout<<"signo: "<<signo<<endl;
+//     //为了处理同一时间下面，只收到一个信号，但是多个进程退出的情况
+//     //所以，这个时候必须要使用while循环去重复回收子进程。
+//     while(true)
+//     {
+//         int rid=waitpid(-1,nullptr,WNOHANG);
+//         if(rid<0)
+//         {
+//             cerr<<"waitpid error"<<endl;
+//             break;
+//         }
+//         else if(rid>0)
+//         {
+//             cout<<"subprocess is recycled."<<endl;
+//             break;
+//         }
+//         else
+//         {
+//             cout<<"there is no subprocess."<<endl;
+//             break;
+//         }
+
+//     }
+// }
+// int main()
+// {
+//     signal(SIGCHLD, Handler);
+//     for (int i = 0; i < 5; i++)
+//     {
+//         if (fork() == 0)
+//         {
+//             cout << "i am subprocess,pid: " << getpid() << endl;
+//             exit(0);
+//         }
+//     }
+
+//     while (true)
+//     {
+//         //cout << "i am fatherprocess,pid: " << getpid() << endl;
+//         sleep(1);
+//     }
+
+//     //
+//     // if (::fork() == 0)
+//     // {
+//     //     while (true)
+//     //     {
+//     //         cout << "i am subprocess,pid: " << getpid() << endl;
+//     //         sleep(1);
+//     //     }
+//     //     exit(0);
+//     // }
+//     // signal(SIGCHLD,Handler);
+//     // 这里的父进程每次都要阻塞式的等待子进程进行完毕
+//     // 或者是waitpid采用不阻塞的方式，但是OS每次要轮询访问子进程，看子进程有没有退出
+//     //  pid_t rid = ::waitpid(-1, nullptr, WNOHANG);
+//     //  if (rid < 0)
+//     //  {
+//     //      cerr << "waitpid failure." << endl;
+//     //      exit(1);
+//     //  }
+//     //  else if(rid>0)
+//     //  {
+//     //      cout<<"subprocess exit succussfully!"<<endl;
+//     //  }
+//     //  else
+//     //  {
+//     //      cout<<"no subprocess is over!"<<endl;
+//     //  }
+
+//     return 0;
+// }
 
 // void sigcb(int signo )
 // {
