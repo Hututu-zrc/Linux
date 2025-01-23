@@ -38,7 +38,7 @@ public:
     }
     void SetA(int a)
     {
-        _a=a;
+        _a = a;
     }
     int GetResult()
     {
@@ -86,16 +86,19 @@ int main()
     // 等待多线程
     for (int i = 0; i < 10; i++)
     {
-        pthread_join(tid[i],nullptr);
+        pthread_detach(tid[i]);
     }
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     pthread_join(tid[i],nullptr);
+    // }
 
     // 回收线程
-    for(int i=0;i<10;i++)
+    for (int i = 0; i < 10; i++)
     {
-        cout<<td[i].GetName()<<",result: "<<td[i].GetResult()<<endl;
+        cout << td[i].GetName() << ",result: " << td[i].GetResult() << endl;
     }
 
-   
     return 0;
 }
 
