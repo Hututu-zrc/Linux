@@ -1,7 +1,7 @@
 bin=TestThread
 cc=g++
 src=$(wildcard *.cc)
-obj=$(src::cc=.o)
+obj=$(src:.cc=.o)
 
 $(bin):$(obj)
 	$(cc) -o $@ $^ -lpthread
