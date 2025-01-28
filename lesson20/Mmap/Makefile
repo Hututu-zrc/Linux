@@ -10,6 +10,6 @@ $(BIN):$(SRC)
 
 
 
-.PHONEY:clean
+.PHONY:clean
 clean:
 	rm -f $(BIN) 

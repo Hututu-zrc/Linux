@@ -20,7 +20,8 @@ int main()
         exit(1);
     }
 
-    // 获取文件的大小
+    // 用于获取fd文件的信息，里面包含fd文件的大小
+    //下面会用到fd文件的大小
     struct stat sb;
     if (::fstat(fd, &sb) < 0)
     {
