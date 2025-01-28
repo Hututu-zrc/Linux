@@ -1,6 +1,7 @@
 #include <iostream>
 #include "SharedMemory.hpp"
 #include <string.h>
+#include <string>
 int main()
 {
     SharedMemory shm;
@@ -9,15 +10,23 @@ int main()
     
     //开始传输文件
     char * str=(char*)shm.GetAddress();
-    char alp='A';
-    std::string message;
-    while(alp<='Z')
+    std::string buff;
+    while(true)
     {
-        message+=alp;
-        strcpy(str,message.c_str());
-        sleep(3);
-        alp+=1;
+        std::getline(std::cin,buff);
+        strcpy(str,buff.c_str());
     }
+
+
+    // char alp='A';
+    // std::string message;
+    // while(alp<='Z')
+    // {
+    //     message+=alp;
+    //     strcpy(str,message.c_str());
+    //     sleep(3);
+    //     alp+=1;
+    // }
 
     
     shm.DetachShm();
