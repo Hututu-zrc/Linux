@@ -2,7 +2,6 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "Mutex.hpp"
-#include "Cond.hpp"
 namespace CondModule
 {
     class Cond

@@ -36,7 +36,7 @@ namespace ThreadModule
         }
 
     public:
-        using func_t = std::function<void(T)>;//此时这个需要放在模板内部，这样两个模板就都是一样的
+        using func_t = std::function<void(T)>; // 此时这个需要放在模板内部，这样两个模板就都是一样的
         Thread(func_t func, T data) : _joinable(true), _func(func), _status(NEW), _data(data)
         {
             _name = "Thread_" + std::to_string(count++);

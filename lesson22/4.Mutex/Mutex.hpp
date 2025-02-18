@@ -1,7 +1,7 @@
 #pragma once
 #include <pthread.h>
 
-namespace MutexMudole
+namespace MutexModule
 {
     class Mutex
     {

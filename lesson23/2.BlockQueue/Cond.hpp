@@ -12,7 +12,7 @@ namespace CondModule
         {
             pthread_cond_init(&_cond,nullptr);
         }
-        void Wait(MutexMudole:: Mutex &mutex)
+        void Wait(MutexModule:: Mutex &mutex)
         {
             pthread_cond_wait(&_cond,mutex.LockPtr());
         }
