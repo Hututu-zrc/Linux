@@ -46,7 +46,7 @@ int main()
     pthread_join(td1, nullptr);
     pthread_join(td2, nullptr);
 
-    pthread_mutex_destroy(&cond);
+    pthread_mutex_destroy(&lock);
     pthread_cond_destroy(&cond);
     return 0;
 }
