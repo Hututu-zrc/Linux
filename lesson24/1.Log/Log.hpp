@@ -66,6 +66,7 @@ namespace LogModule
             {
                 return;
             }
+            //std::cout<<"return "<<std::endl;
             try
             {
                 // 可能创建不成功，这使用try-catch捕捉
@@ -97,13 +98,7 @@ namespace LogModule
             {
                 return;
             }
-            // try
-            // {
-            // }
-            // catch (const std::ios_base::failure &e)
-            // {
-            //     std::cerr << e.what() << '\n';
-            // }
+        
         }
         ~FileStrategy() {}
 
@@ -157,6 +152,16 @@ namespace LogModule
         // 这里构造函数默认为屏幕刷新
         Logger() : _strategy(std::make_unique<ConsoleStrategy>())
         {
+        }
+        //创建两个函数用来改变刷新策略
+        void UseFileSrategy()
+        {
+            _strategy=std::make_unique<FileStrategy>();
+
+        }
+        void UseConsoleStrategy()
+        {
+            _strategy=std::make_unique<ConsoleStrategy>();
         }
         ~Logger() {}
 
@@ -230,5 +235,7 @@ namespace LogModule
     Logger logger;
     //创建logger变量，然后宏替换
     #define LOG(type) logger(type, __FILE__, __LINE__)
+    #define ENABLE_CONSOLE_LOG() logger.UseConsoleStrategy()
+    #define ENABLE_FILE_LOG() logger.UseFileSrategy()
 
 }
