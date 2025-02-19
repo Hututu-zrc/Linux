@@ -1,4 +1,4 @@
-bin=log
+bin=testlog
 cc=g++
 src=$(wildcard *.cc)
 obj=$(src:.cc=.o)
