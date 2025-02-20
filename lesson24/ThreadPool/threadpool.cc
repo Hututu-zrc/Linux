@@ -18,7 +18,7 @@ int main()
         // sleep(1);
         pool.Equeue(Routine);
     }
-
+    pool.Stop();
     pool.Wait();
     return 0;
 }

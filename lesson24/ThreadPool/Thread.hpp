@@ -16,7 +16,7 @@ namespace ThreadModule
         RUNNING,
         STOP
     };
-    using func_t = std::function<void()>;
+    using func_t = std::function<void(std::string)>;
     class Thread
     {
     private:
@@ -25,7 +25,7 @@ namespace ThreadModule
         static void *Routine(void *args) // 用来调用用户传入的函数
         {
             Thread *t = static_cast<Thread *>(args);
-            t->_func();
+            t->_func( t->_name);
             t->_status = RUNNING;
             return nullptr;
         }
