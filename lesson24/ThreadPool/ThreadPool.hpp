@@ -1,6 +1,7 @@
 #pragma once
 #include <pthread.h>
 #include <vector>
+#include <unordered_map>
 #include <iostream>
 #include <queue>
 #include <memory>
@@ -16,9 +17,6 @@ using namespace ThreadModule;
 namespace ThreadPoolModule
 {
     const static int defaultnum = 5;
-    void TestFunc()
-    {
-    }
 
     template <typename T>
     class Threadpool
@@ -29,7 +27,7 @@ namespace ThreadPoolModule
         {
             return _tasks.empty();
         }
-        void ExecuteTask()
+        void ExecuteTask(std::string name)
         {
 
             while (true)
@@ -38,14 +36,33 @@ namespace ThreadPoolModule
                 // 访问了临界资源任务队列，需要加锁
                 sleep(1);
                 T t;
+
+                // 这里的锁在{}当中，出了这个作用域就会被销毁了
                 {
                     LockGuard lock(_mutex);
-                    while (IsEmpty())
+
+                    // 任务队列不为空 && 线程池处于进行状态
+                    // 此时线程池正常运行
+                    while (IsEmpty() && _isrunning)
                     {
+
                         _wait_num++;
                         _cond.Wait(_mutex);
                         _wait_num--;
                     }
+
+                    if (IsEmpty() && !_isrunning)
+                    {
+                        LOG(LogLevel::DEBUG) << "threadpool closed";
+                        break;
+                    }
+
+                    // 如果线程池为空 && 线程池处于关闭状态，此时跳出循环
+                    // 准备回收线程
+
+                    LOG(LogLevel::DEBUG)<<name<<" is running";
+
+
                     t = _tasks.front();
                     _tasks.pop();
                 }
@@ -57,11 +74,13 @@ namespace ThreadPoolModule
 
     public:
         Threadpool(int num = defaultnum) : _thread_num(num),
-                                           _wait_num(0)
+                                           _wait_num(0),
+                                           _isrunning(false)
         {
             for (int i = 0; i < _thread_num; ++i)
             {
-                _threads.push_back(std::make_shared<Thread>(std::bind(&Threadpool::ExecuteTask, this)));
+                _threads.push_back(std::make_shared<Thread>(std::bind(&Threadpool::ExecuteTask, this,std::placeholders::_1)));
+               
             }
         }
 
@@ -71,8 +90,6 @@ namespace ThreadPoolModule
             LockGuard lock(_mutex);
             _tasks.push(move(t));
 
-
-
             if (_wait_num > 0)
             {
                 _cond.Notify();
@@ -80,9 +97,13 @@ namespace ThreadPoolModule
         }
         void Start() // 线程池启动函数
         {
+            LockGuard lock(_mutex);
+
+            _isrunning = true;
             for (auto &e : _threads)
             {
                 e->Start();
+                LOG(LogLevel::DEBUG) << e->GetName() << " is start";
             }
         }
         void Wait() // 线程池等待函数
@@ -90,20 +111,37 @@ namespace ThreadPoolModule
             for (auto &e : _threads)
             {
                 e->Join();
+                LOG(LogLevel::DEBUG) << e->GetName() << " is stop";
             }
         }
         void Stop() // 线程池停止函数
         {
+            // 线程池停止我们必须保证
+            // 1.任务队列里面的任务全部都进行完了
+            // 2.将所有的休眠进程都唤醒
+
+            LockGuard lock(_mutex);
+
+            if (!_isrunning) // 关闭状态就退出
+            {
+                return;
+            }
+            _isrunning = false;
+            if (_wait_num > 0)
+            {
+                _cond.Notify();
+            }
         }
         ~Threadpool()
         {
         }
 
     private:
-        int _thread_num;
-        int _wait_num;                                 // 有多少个线程在等待
-        std::vector<std::shared_ptr<Thread>> _threads; // 线程存放的地方
-
+        int _thread_num;                                                        // 线程池里面的线程的个数
+        int _wait_num;                                                          // 有多少个线程在等待
+        bool _isrunning;                                                        // 线程池的启动状态，默认是关闭
+        std::vector<std::shared_ptr<Thread>> _threads;                          // 线程存放的地方
+        
         // 判断一个地方要不要使用锁，核心就是盖地方要不要访问临界资源
         std::queue<T> _tasks; // 任务队列 临界资源（多线程访问）
         Mutex _mutex;
