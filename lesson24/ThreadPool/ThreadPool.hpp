@@ -60,8 +60,7 @@ namespace ThreadPoolModule
                     // 如果线程池为空 && 线程池处于关闭状态，此时跳出循环
                     // 准备回收线程
 
-                    LOG(LogLevel::DEBUG)<<name<<" is running";
-
+                    LOG(LogLevel::DEBUG) << name << " is running";
 
                     t = _tasks.front();
                     _tasks.pop();
@@ -79,8 +78,7 @@ namespace ThreadPoolModule
         {
             for (int i = 0; i < _thread_num; ++i)
             {
-                _threads.push_back(std::make_shared<Thread>(std::bind(&Threadpool::ExecuteTask, this,std::placeholders::_1)));
-               
+                _threads.push_back(std::make_shared<Thread>(std::bind(&Threadpool::ExecuteTask, this, std::placeholders::_1)));
             }
         }
 
@@ -99,12 +97,23 @@ namespace ThreadPoolModule
         {
             LockGuard lock(_mutex);
 
+            if (_isrunning)
+                return;
+            //这里如果不加锁 && _isrunning 放到最后的话，就会产生问题
+            //因为线程是并发跑的，可能前一个线程刚启动的时候，就直接执行ExecuteTask
+            //但是ExecuteTask里面有if (IsEmpty() && !_isrunning) 就直接退出掉这个进程了
+            //解决办法：1、加锁  2、将_isrunning=true 放到if (_isrunning)后面
             _isrunning = true;
+
+
             for (auto &e : _threads)
             {
                 e->Start();
                 LOG(LogLevel::DEBUG) << e->GetName() << " is start";
             }
+
+
+
         }
         void Wait() // 线程池等待函数
         {
@@ -137,11 +146,11 @@ namespace ThreadPoolModule
         }
 
     private:
-        int _thread_num;                                                        // 线程池里面的线程的个数
-        int _wait_num;                                                          // 有多少个线程在等待
-        bool _isrunning;                                                        // 线程池的启动状态，默认是关闭
-        std::vector<std::shared_ptr<Thread>> _threads;                          // 线程存放的地方
-        
+        int _thread_num;                               // 线程池里面的线程的个数
+        int _wait_num;                                 // 有多少个线程在等待
+        bool _isrunning;                               // 线程池的启动状态，默认是关闭
+        std::vector<std::shared_ptr<Thread>> _threads; // 线程存放的地方
+
         // 判断一个地方要不要使用锁，核心就是盖地方要不要访问临界资源
         std::queue<T> _tasks; // 任务队列 临界资源（多线程访问）
         Mutex _mutex;
