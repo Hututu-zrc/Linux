@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "UdpClient.hpp"
+#include"Common.hpp"
 #include "Log.hpp"
 
 using std::cerr;
@@ -18,14 +19,13 @@ using std::cout;
 using std::endl;
 using namespace LogModule;
 
-#define CONV(type) (struct sockaddr *)(type)
 
 int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
         cerr << "argument less " << endl;
-        return 1;
+        Die(Err::USAGE_ERR);
     }
 
     std::string ip = argv[1];
@@ -36,14 +36,14 @@ int main(int argc, char *argv[])
     if (socket_fd < 0)
     {
         LOG(LogLevel::FATAL) << "socket_fd";
-        exit(1);
+        Die(Err::SOCKET_ERR);
     }
 
     // 2、填充struct sockaddr信息
     struct sockaddr_in server;
     memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
-    server.sin_port = ::ntohs(port);
+    server.sin_port = ::htons(port);
     server.sin_addr.s_addr = inet_addr(ip.c_str());
 
     // 3、client主体收发程序
@@ -60,9 +60,8 @@ int main(int argc, char *argv[])
         if (n < 0)
         {
             LOG(LogLevel::FATAL) << strerror(errno);
-            exit(1);
+            Die(Err::SENDTO_ERR);
         }
-
         // 3.3 recvfrom函数
         char buff[1024];
         struct sockaddr_in temp;
@@ -72,7 +71,7 @@ int main(int argc, char *argv[])
         if (m < 0)
         {
             LOG(LogLevel::FATAL) << strerror(errno);
-            exit(2);
+            Die(Err::RECVFROM_ERR);
         }
         buff[m]=0;
         cout<<buff<<endl;

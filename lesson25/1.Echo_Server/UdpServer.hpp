@@ -18,20 +18,19 @@
 #include "Mutex.hpp"
 #include "Log.hpp"
 #include "Common.hpp"
+#include "InetAddr.hpp"
 
 using namespace LogModule;
 const static int default_gsocketfd = -1;
-const static std::string default_ip = "127.0.0.1";
+// const static std::string default_ip = "127.0.0.1";
 const static uint16_t default_port = 8080;
-#define CONV(type) (struct sockaddr *)(type)
 class UdpServer
 {
 
 public:
-    UdpServer(const std::string &ip = default_ip, uint16_t port = default_port)
+    UdpServer(uint16_t port = default_port)
         : _socket_fd(default_gsocketfd),
-          _ip(ip),
-          _port(port),
+          _addr(port),
           _isrunning(false)
     {
     }
@@ -46,9 +45,9 @@ public:
         if (_socket_fd < 0)
         {
             LOG(LogLevel::FATAL) << strerror(errno);
-            exit(1);
+            Die(Err::SOCKET_ERR);
         }
-        //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
+         //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
 
         // 2.配置套接字里面的属性 绑定端口号 告诉系统基本的信息
         // int bind(int sockfd, const struct sockaddr *addr,socklen_t addrlen);
@@ -56,40 +55,40 @@ public:
         // 第二个参数是套接字里面的属性结构体，主要是地址类型+端口号+ip地址
         // 第三个参数是第二个参数里面的长度
         // struct sockaddr的初始化操作
-        // {
-        struct sockaddr_in local; // 地址类型+端口号+ip地址
 
-        // 这个参数首先要清零，然后对里面的数据进行赋值，因为结构体不能集体赋值
+        // struct sockaddr_in local; // 地址类型+端口号+ip地址
 
-        // 这个函数直接将指针里面指向的内容全部清零，也可以使用memset
-        bzero(&local, sizeof(local));
-        local.sin_family = AF_INET;
-        // 这里还需要将主机字节序，转变为网络字节序
-        // uint16_t htons(uint16_t __hostshort) noexcept(true)
-        local.sin_port = ::htons(_port);
+        // // 这个参数首先要清零，然后对里面的数据进行赋值，因为结构体不能集体赋值
 
-        // in_addr_t inet_addr(const char *__cp) noexcept(true)
-        // in_addr_t 其实就是32位的整数，因为ipv4有32位
-        local.sin_addr.s_addr = ::inet_addr(_ip.c_str());
-        //}
+        // // 这个函数直接将指针里面指向的内容全部清零，也可以使用memset
+        // bzero(&local, sizeof(local));
+        // local.sin_family = AF_INET;
+        // // 这里还需要将主机字节序，转变为网络字节序
+        // // uint16_t htons(uint16_t __hostshort) noexcept(true)
+        // local.sin_port = ::htons(_port);
 
-        int n = ::bind(_socket_fd, CONV(&local), sizeof(local));
+        // // in_addr_t inet_addr(const char *__cp) noexcept(true)
+        // // in_addr_t 其实就是32位的整数，因为ipv4有32位
+        // local.sin_addr.s_addr = ::inet_addr(_ip.c_str());
+
+        int n = ::bind(_socket_fd, CONV(_addr.GetAddr()), _addr.GetLen());
         if (n != 0)
         {
             LOG(LogLevel::FATAL) << strerror(errno);
-            exit(2);
+            Die(Err::BIND_ERR);
         }
-        //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
+        //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_addr.GetIp();
 
         //  3.激活套接字 //告诉网络socket的信息
         // 属于start函数里面的了
     }
     void Start()
     {
+        //LOG(LogLevel::DEBUG)<<"port :"<<_addr.GetPort();
         if (_isrunning)
             return;
         _isrunning = true;
-        //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
+        // LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
 
         // 服务器端启动以后就不需要停止的
         while (true)
@@ -100,38 +99,38 @@ public:
             //  size_t len 一般就是sizeof(buff)-1，留一个字符给'\0'
             // struct sockaddr *src_addr 这个参数属于输入型参数，需要自己定义变量接收
             char buff[1024];
-           // LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
+
+            
             struct sockaddr peer;
             socklen_t len = sizeof(peer);
             ssize_t n = recvfrom(_socket_fd, buff, sizeof(buff) - 1, 0, &peer, &len);
+           
+
             if (n < 0)
             {
                 LOG(LogLevel::FATAL) << strerror(errno);
-                exit(3);
+                Die(Err::RECVFROM_ERR);
             }
-
+            
             // ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,const struct sockaddr *dest_addr, socklen_t addrlen);
             // const struct sockaddr *dest_addr 就是recvfrom拿到的结构体
             // std::cout<<buff<<std::endl;
 
-            
-            struct sockaddr_in * Rev=(struct sockaddr_in*)(&peer);
+            struct sockaddr_in *Rev = (struct sockaddr_in *)(&peer);
             std::string revip(::inet_ntoa(Rev->sin_addr));
-            uint16_t port=ntohs(Rev->sin_port);
-
-            LOG(LogLevel::DEBUG)<<" "<<revip.c_str()<<" "<<port;
-            //recvfrom 函数返回实际接收到的字节数 n，但它并不会在接收到的数据末尾自动添加字符串结束符 '\0'。
-            //也就是说，buff 数组中存储的只是原始的二进制数据，没有以 '\0' 结尾。
-            buff[n]=0;
+            uint16_t port = ntohs(Rev->sin_port);
+            LOG(LogLevel::DEBUG) << " " << revip.c_str() << " " << port;
+            // recvfrom 函数返回实际接收到的字节数 n，但它并不会在接收到的数据末尾自动添加字符串结束符 '\0'。
+            // 也就是说，buff 数组中存储的只是原始的二进制数据，没有以 '\0' 结尾。
+            buff[n] = 0;
             std::string echo_message = "Echo# ";
             echo_message += buff;
-            std::cout<<echo_message<<std::endl;
-            
+            std::cout << echo_message << std::endl;
             ssize_t m = ::sendto(_socket_fd, echo_message.c_str(), echo_message.size(), 0, CONV(&peer), sizeof(peer));
             if (m < 0)
             {
                 LOG(LogLevel::FATAL) << strerror(errno);
-                exit(4);
+                Die(Err::SENDTO_ERR);
             }
         }
         _isrunning = false;
@@ -150,7 +149,9 @@ public:
 
 private:
     int _socket_fd;
-    std::string _ip;
-    uint16_t _port;
+    // 服务器端不需要限定ip地址的，只需要限定端口就行了
+    // 在很多情况下，服务器并不关心连接是从哪个网络接口进来的，只需要监听所有可用的网络接口。
+    // 一个进程可以绑定多个端口，一个端口只能绑定一个进程
+    Inet_addr _addr;
     bool _isrunning;
 };
