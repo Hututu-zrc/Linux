@@ -47,7 +47,7 @@ public:
             LOG(LogLevel::FATAL) << strerror(errno);
             Die(Err::SOCKET_ERR);
         }
-         //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
+        // LOG(LogLevel::DEBUG)<<"_socketfd: "<<_socket_fd;
 
         // 2.配置套接字里面的属性 绑定端口号 告诉系统基本的信息
         // int bind(int sockfd, const struct sockaddr *addr,socklen_t addrlen);
@@ -77,14 +77,14 @@ public:
             LOG(LogLevel::FATAL) << strerror(errno);
             Die(Err::BIND_ERR);
         }
-        //LOG(LogLevel::DEBUG)<<"_socketfd: "<<_addr.GetIp();
+        // LOG(LogLevel::DEBUG)<<"_socketfd: "<<_addr.GetIp();
 
         //  3.激活套接字 //告诉网络socket的信息
         // 属于start函数里面的了
     }
     void Start()
     {
-        //LOG(LogLevel::DEBUG)<<"port :"<<_addr.GetPort();
+        // LOG(LogLevel::DEBUG)<<"port :"<<_addr.GetPort();
         if (_isrunning)
             return;
         _isrunning = true;
@@ -100,26 +100,25 @@ public:
             // struct sockaddr *src_addr 这个参数属于输入型参数，需要自己定义变量接收
             char buff[1024];
 
-            
-            struct sockaddr peer;
+            struct sockaddr_in peer;
             socklen_t len = sizeof(peer);
-            ssize_t n = recvfrom(_socket_fd, buff, sizeof(buff) - 1, 0, &peer, &len);
-           
+            ssize_t n = recvfrom(_socket_fd, buff, sizeof(buff) - 1, 0, CONV(&peer), &len);
 
             if (n < 0)
             {
                 LOG(LogLevel::FATAL) << strerror(errno);
                 Die(Err::RECVFROM_ERR);
             }
-            
+
             // ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,const struct sockaddr *dest_addr, socklen_t addrlen);
             // const struct sockaddr *dest_addr 就是recvfrom拿到的结构体
             // std::cout<<buff<<std::endl;
 
-            struct sockaddr_in *Rev = (struct sockaddr_in *)(&peer);
-            std::string revip(::inet_ntoa(Rev->sin_addr));
-            uint16_t port = ntohs(Rev->sin_port);
-            LOG(LogLevel::DEBUG) << " " << revip.c_str() << " " << port;
+            // struct sockaddr_in *Rev = (struct sockaddr_in *)(&peer);
+            // std::string revip(::inet_ntoa(Rev->sin_addr));
+            // uint16_t port = ntohs(Rev->sin_port);
+            Inet_addr Rev(peer);
+            LOG(LogLevel::DEBUG) << " " << Rev.GetIp() << " " << Rev.GetPort();
             // recvfrom 函数返回实际接收到的字节数 n，但它并不会在接收到的数据末尾自动添加字符串结束符 '\0'。
             // 也就是说，buff 数组中存储的只是原始的二进制数据，没有以 '\0' 结尾。
             buff[n] = 0;

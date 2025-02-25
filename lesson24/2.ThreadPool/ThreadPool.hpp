@@ -151,7 +151,7 @@ namespace ThreadPoolModule
         bool _isrunning;                               // 线程池的启动状态，默认是关闭
         std::vector<std::shared_ptr<Thread>> _threads; // 线程存放的地方
 
-        // 判断一个地方要不要使用锁，核心就是盖地方要不要访问临界资源
+        // 判断一个地方要不要使用锁，核心就是该地方要不要访问临界资源
         std::queue<T> _tasks; // 任务队列 临界资源（多线程访问）
         Mutex _mutex;
         Cond _cond;

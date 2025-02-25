@@ -51,6 +51,7 @@
         "semaphore": "cpp",
         "sstream": "cpp",
         "fstream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "codecvt": "cpp"
     }
 }

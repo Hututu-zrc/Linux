@@ -6,7 +6,11 @@
 #include <arpa/inet.h>
 #include "Common.hpp"
 
-class Inet_addr
+
+//该类有两个功能
+//1、将收到的struct sockaddr里面的数据放到下面的这个类里面，可以打印
+//2、根据port初始化sockaddr，用于服务器bind
+class Inet_addr  
 {
 private:
     void PortNetToHost()
