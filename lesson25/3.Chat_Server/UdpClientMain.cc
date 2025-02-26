@@ -23,22 +23,19 @@ using namespace LogModule;
 int socket_fd = -1;
 struct sockaddr_in server;
 
-
-
-
 void *RevMessage(void *arg)
 {
     while (true)
     {
 
-        //LockGuard lockguard(_mutex);
-        // 这里加锁是错的，recvfrom一直等待消息，会卡住锁
+        // LockGuard lockguard(_mutex);
+        //  这里加锁是错的，recvfrom一直等待消息，会卡住锁
         char buff[1024];
         struct sockaddr_in temp;
         socklen_t len = sizeof(temp);
-        
+
         int m = ::recvfrom(socket_fd, buff, sizeof(buff), 0, CONV(&temp), &len);
-        //LOG(LogLevel::DEBUG) << " RevMessage";
+        // LOG(LogLevel::DEBUG) << " RevMessage";
 
         if (m < 0)
         {
@@ -83,14 +80,14 @@ int main(int argc, char *argv[])
     }
 
     // 2、填充struct sockaddr信息
-   
+
     memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
     server.sin_port = ::htons(port);
     server.sin_addr.s_addr = inet_addr(ip.c_str());
 
     // 创建子进程，这样可以边收边发
-    //std::cout << "client start" << std::endl;
+    // std::cout << "client start" << std::endl;
     pthread_t tid;
     pthread_create(&tid, nullptr, RevMessage, nullptr);
 

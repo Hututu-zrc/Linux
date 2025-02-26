@@ -150,25 +150,25 @@ public:
             // 也就是说，buff 数组中存储的只是原始的二进制数据，没有以 '\0' 结尾。
             buff[n] = 0;
 
-            
             std::string echo_message = "Echo# ";
 
-            if (strcmp(buff,"QUIT")==0)
+            if (strcmp(buff, "QUIT") == 0)
             {
 
                 _reomve(Rev);
                 echo_message += "我走了，你们聊";
                 LOG(LogLevel::INFO) << echo_message;
-                std::cout << echo_message << std::endl;
+                // std::cout << echo_message << std::endl;
             }
             else
             {
+                LOG(LogLevel::DEBUG) << " " << Rev.GetIp() << " " << Rev.GetPort() << ": " <<buff;
+
                 echo_message += buff;
             }
 
             // std::cout << echo_message << std::endl;
             // 这里是简单的分发任务
-            LOG(LogLevel::DEBUG) << " " << Rev.GetIp() << " " << Rev.GetPort()<< ": "<<echo_message;
 
             task_t f = std::bind(_route, _socket_fd, echo_message);
             Threadpool<task_t>::CreateSingleThreadPool()->Equeue(f);

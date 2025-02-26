@@ -28,14 +28,13 @@ int main()
     // Lambda 表达式本质上是编译器自动生成一个匿名类，并重载 operator()。
     // 以 [&um](const Inet_addr& addr) { um->AddUser(addr); } 为例，（个人理解，um有点像匿名类的内部成员变量了）
     // 当调用 _adduser 时，直接执行 Lambda 表达式内部定义的代码 um->AddUser(addr)，没有中间的转发层。
-     server->RegisterService(
-         [&um](const Inet_addr& addr){
-         um->AddUser(addr);},
-         [&um](int sockfd,const std::string& msg){
-         um->Route(sockfd, msg);},
-         [&um](const Inet_addr& addr){
-            um->DelUser(addr);}
-     );
+    server->RegisterService(
+        [&um](const Inet_addr &addr)
+        { um->AddUser(addr); },
+        [&um](int sockfd, const std::string &msg)
+        { um->Route(sockfd, msg); },
+        [&um](const Inet_addr &addr)
+        { um->DelUser(addr); });
 
     // LOG(LogLevel::DEBUG)<<"_socketfd: "<<server->GetSocketFd();;
 
