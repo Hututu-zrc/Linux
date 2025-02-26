@@ -177,15 +177,15 @@ public:
     }
 
 private:
-    int _socket_fd;
+    int _socket_fd;//临界资源
     // 服务器端不需要限定ip地址的，只需要限定端口就行了
     // 在很多情况下，服务器并不关心连接是从哪个网络接口进来的，只需要监听所有可用的网络接口。
     // 一个进程可以绑定多个端口，一个端口只能绑定一个进程
-    Inet_addr _addr;
-    bool _isrunning;
+    Inet_addr _addr;//这里是服务器的地址
+    bool _isrunning;//服务器是否启动
 
-    adduser_t _adduser;
-    route_t _route;
+    adduser_t _adduser;//添加用户
+    route_t _route;//  
 
 
 };
