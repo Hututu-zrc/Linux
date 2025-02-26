@@ -9,13 +9,13 @@
 #include <string>
 #include <list>
 #include <memory>
-#include <mutex>
+#include "Mutex.hpp"
 #include "Log.hpp"
 #include "Common.hpp"
 #include "InetAddr.hpp"
 
-using namespace MutexModule;
 using namespace LogModule;
+using namespace MutexModule;
 namespace UserModule
 {
     class UserInterface
@@ -24,6 +24,7 @@ namespace UserModule
         virtual ~UserInterface() = default;
         virtual void SendTo(int &sockfd, const std::string &msg) = 0;
         virtual bool operator==(const Inet_addr &user) = 0;
+        virtual std::string GetId(const Inet_addr &user)=0;
     };
     class User : public UserInterface // 唯一标识符就是addr
     {
@@ -34,6 +35,7 @@ namespace UserModule
 
         void SendTo(int &sockfd, const std::string &msg) override
         {
+
             ::sendto(sockfd, msg.c_str(), msg.size(), 0, _user.GetAddr(), _user.GetLen());
         }
         bool operator==(const Inet_addr &user) override
@@ -44,12 +46,14 @@ namespace UserModule
 
             return user == _user;
         }
-
+        std::string GetId(const Inet_addr &user)
+        {
+            return user.GetIp();
+        }
         ~User() {}
 
     private:
         Inet_addr _user;
-        Mutex _mutex;
     };
 
     class UserManage
@@ -58,6 +62,8 @@ namespace UserModule
         UserManage() {}
         void AddUser(const Inet_addr &user)
         {
+            LockGuard lockguard(_mutex);
+
             // 首先查找该用户是否存在于list当中
             for (auto &e : _users)
             {
@@ -69,27 +75,33 @@ namespace UserModule
             // 如果不存在就添加
             LOG(LogLevel::INFO) << "Add NewUser";
             _users.push_back(std::make_shared<User>(user));
-           
-     
         }
         void DelUser(const Inet_addr &user)
         {
+            LOG(LogLevel::DEBUG) << "deluser is running";
+
             _users.remove_if([&user](std::shared_ptr<UserInterface> id)
-                             {
-                if(*id==user)
-                    return true; });
-            _users.erase(_users.end());
+                             { return *id == user; });
+           // _users.erase(_users.end());
+            // LOG(LogLevel::DEBUG) << "deluser is over";
         }
         void Route(int sockfd, const std::string &msg) // 将消息转发到所有用户
         {
+            LockGuard lockguard(_mutex);
+
             for (auto &e : _users)
             {
                 e->SendTo(sockfd, msg);
+            LOG(LogLevel::DEBUG) << " " << e->GetId();
+
             }
         }
         ~UserManage() {}
 
     private:
+        // 转发和添加过程中，会同时访问_users，属于临界资源需要保护
         std::list<std::shared_ptr<UserInterface>> _users;
+
+        Mutex _mutex;
     };
 }
