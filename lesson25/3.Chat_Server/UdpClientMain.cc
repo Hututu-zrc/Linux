@@ -18,10 +18,12 @@ using std::cerr;
 using std::cout;
 using std::endl;
 using namespace LogModule;
-
+using namespace MutexModule;
 int socket_fd = -1;
+Mutex mutex;
 void *RevMessage(void *arg)
 {
+    LockGuard lockguard(mutex);
     while (true)
     {
         char buff[1024];
@@ -78,8 +80,10 @@ int main(int argc, char *argv[])
         cout << "Please# ";
         std::getline(std::cin, input);
 
+    
         // 3.2 sendto函数
         // 客户端不需要bind函数 操作系统会自动为客户端分配一个可用的本地地址和端口
+        LockGuard lockguard(mutex);
         int n = ::sendto(socket_fd, input.c_str(), input.size(), 0, CONV(&server), sizeof(server));
         if (n < 0)
         {
