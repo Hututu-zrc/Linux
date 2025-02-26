@@ -15,7 +15,6 @@
 #include <memory>
 #include <functional>
 
-
 // 自己封装的库
 #include "Mutex.hpp"
 #include "Log.hpp"
@@ -31,27 +30,32 @@ using namespace ThreadModule;
 const static int default_gsocketfd = -1;
 // const static std::string default_ip = "127.0.0.1";
 const static uint16_t default_port = 8888;
+// static量，只能被声明它的那个文件中的所有函数访问
+// 这意味着即使在不同的文件中也有同名的 static const int 变量，它们也是独立的，互不影响
 
-using adduser_t =std::function<void (const Inet_addr &user)>;
-using route_t = std::function<void (int sockfd, const std::string &msg)>;
-using task_t =std::function<void ()>;
+const static std::string ExitMessage = "我走了，你们聊";
+using adduser_t = std::function<void(const Inet_addr &user)>;
+using route_t = std::function<void(int sockfd, const std::string &msg)>;
+using remove_t = std::function<void(const Inet_addr &user)>;
+using task_t = std::function<void()>;
 
 class UdpServer
 {
 
 public:
-    UdpServer( uint16_t port = default_port)
+    UdpServer(uint16_t port = default_port)
         : _socket_fd(default_gsocketfd),
           _addr(port),
           _isrunning(false)
- 
+
     {
     }
 
-    void RegisterService(adduser_t adduser,route_t route)
+    void RegisterService(adduser_t adduser, route_t route, remove_t remove)
     {
         _adduser = adduser;
         _route = route;
+        _reomve = remove;
     }
     void InitServer()
     {
@@ -138,21 +142,35 @@ public:
             // uint16_t port = ntohs(Rev->sin_port);
             Inet_addr Rev(peer);
 
-            //开始判断，接收到的是不是新用户，如果是新用户就添加，如果不是就转发
+            // 开始判断，接收到的是不是新用户，如果是新用户就添加，如果不是就转发
             _adduser(Rev);
 
-
-
-
-            LOG(LogLevel::DEBUG) << " " << Rev.GetIp() << " " << Rev.GetPort();
+            // LOG(LogLevel::DEBUG) << " " << Rev.GetIp() << " " << Rev.GetPort();
             // recvfrom 函数返回实际接收到的字节数 n，但它并不会在接收到的数据末尾自动添加字符串结束符 '\0'。
             // 也就是说，buff 数组中存储的只是原始的二进制数据，没有以 '\0' 结尾。
             buff[n] = 0;
+
+            
             std::string echo_message = "Echo# ";
-            echo_message += buff;
-            std::cout << echo_message << std::endl;
-            //这里是简单的分发任务
-            task_t f=std::bind(_route,_socket_fd,echo_message);
+
+            if (strcmp(buff,"QUIT")==0)
+            {
+
+                _reomve(Rev);
+                echo_message += "我走了，你们聊";
+                LOG(LogLevel::INFO) << echo_message;
+                std::cout << echo_message << std::endl;
+            }
+            else
+            {
+                echo_message += buff;
+            }
+
+            // std::cout << echo_message << std::endl;
+            // 这里是简单的分发任务
+            LOG(LogLevel::DEBUG) << " " << Rev.GetIp() << " " << Rev.GetPort()<< ": "<<echo_message;
+
+            task_t f = std::bind(_route, _socket_fd, echo_message);
             Threadpool<task_t>::CreateSingleThreadPool()->Equeue(f);
             _route(_socket_fd, echo_message);
             // ssize_t m = ::sendto(_socket_fd, echo_message.c_str(), echo_message.size(), 0, CONV(&peer), sizeof(peer));
@@ -177,15 +195,14 @@ public:
     }
 
 private:
-    int _socket_fd;//临界资源
+    int _socket_fd; // 临界资源
     // 服务器端不需要限定ip地址的，只需要限定端口就行了
     // 在很多情况下，服务器并不关心连接是从哪个网络接口进来的，只需要监听所有可用的网络接口。
     // 一个进程可以绑定多个端口，一个端口只能绑定一个进程
-    Inet_addr _addr;//这里是服务器的地址
-    bool _isrunning;//服务器是否启动
+    Inet_addr _addr; // 这里是服务器的地址
+    bool _isrunning; // 服务器是否启动
 
-    adduser_t _adduser;//添加用户
-    route_t _route;//  
-
-
+    adduser_t _adduser; // 添加用户
+    route_t _route;     //
+    remove_t _reomve;
 };
