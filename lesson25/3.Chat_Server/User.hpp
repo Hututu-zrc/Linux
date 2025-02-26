@@ -24,7 +24,7 @@ namespace UserModule
         virtual ~UserInterface() = default;
         virtual void SendTo(int &sockfd, const std::string &msg) = 0;
         virtual bool operator==(const Inet_addr &user) = 0;
-        virtual std::string GetId(const Inet_addr &user)=0;
+        virtual std::string GetId() = 0;
     };
     class User : public UserInterface // 唯一标识符就是addr
     {
@@ -46,9 +46,9 @@ namespace UserModule
 
             return user == _user;
         }
-        std::string GetId(const Inet_addr &user)
+        std::string GetId()
         {
-            return user.GetIp();
+            return _user.GetIp();
         }
         ~User() {}
 
@@ -82,7 +82,7 @@ namespace UserModule
 
             _users.remove_if([&user](std::shared_ptr<UserInterface> id)
                              { return *id == user; });
-           // _users.erase(_users.end());
+            // _users.erase(_users.end());
             // LOG(LogLevel::DEBUG) << "deluser is over";
         }
         void Route(int sockfd, const std::string &msg) // 将消息转发到所有用户
@@ -92,8 +92,7 @@ namespace UserModule
             for (auto &e : _users)
             {
                 e->SendTo(sockfd, msg);
-            LOG(LogLevel::DEBUG) << " " << e->GetId();
-
+                LOG(LogLevel::DEBUG) << " " << e->GetId();
             }
         }
         ~UserManage() {}
