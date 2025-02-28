@@ -14,6 +14,7 @@ enum Err
     BIND_ERR,
     LISTEN_ERR,
     ACCEPT_ERR,
+    CONNECT_ERR,
     RECVFROM_ERR,
     SENDTO_ERR
 
