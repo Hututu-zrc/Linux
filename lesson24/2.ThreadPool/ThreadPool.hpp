@@ -86,6 +86,8 @@ namespace ThreadPoolModule
         {
             // 这个地方要访问临界资源，所以要加锁保护
             LockGuard lock(_mutex);
+            if(_isrunning==false)
+                return ;
             _tasks.push(move(t));
 
             if (_wait_num > 0)

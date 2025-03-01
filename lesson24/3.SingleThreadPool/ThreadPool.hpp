@@ -90,10 +90,14 @@ namespace ThreadPoolModule
         
         static Threadpool<T>* CreateSingleThreadPool()
         {
-            if(!Threadpool<T>::_instance)
+            if(_instance==nullptr)
             {
-                Threadpool<T>::_instance =new Threadpool<T>();
-                
+                LockGuard lcokguard(_mutex);
+                if(_instance==nullptr)
+                {
+                    _instance=new Threadpool<T> ();
+                    _instance->Start();
+                }
             }
             return _instance;
         }
@@ -101,6 +105,8 @@ namespace ThreadPoolModule
         {
             // 这个地方要访问临界资源，所以要加锁保护
             LockGuard lock(_mutex);
+            if(_isrunning==false)
+                return ;
             _tasks.push(move(t));
 
             if (_wait_num > 0)
