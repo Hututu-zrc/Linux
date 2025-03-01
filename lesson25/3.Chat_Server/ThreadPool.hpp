@@ -90,21 +90,23 @@ namespace ThreadPoolModule
         
         static Threadpool<T>* CreateSingleThreadPool()
         {
-            if(!Threadpool<T>::_instance)
+            if(_instance==nullptr)
             {
-                Threadpool<T>::_instance =new Threadpool<T>();
-                _instance ->Start();
+                LockGuard lockguard(_lock);
+                if(_instance==nullptr)
+                {
+                    _instance=new Threadpool<T> ();
+                    _instance->Start();
+                }
             }
             return _instance;
         }
-        void Equeue(T &t) // 任务进入队列的函数
+        void Equeue(const T &t) // 任务进入队列的函数
         {
             // 这个地方要访问临界资源，所以要加锁保护
             LockGuard lock(_mutex);
-            //这里要判断进程池是否是启动状态的的
             if(_isrunning==false)
                 return ;
-            LOG(LogLevel::DEBUG)<<"Equeue";
             _tasks.push(move(t));
 
             if (_wait_num > 0)
@@ -174,10 +176,12 @@ namespace ThreadPoolModule
         Mutex _mutex;
         Cond _cond;
         static Threadpool<T> * _instance;
-
+        static Mutex _lock;
         
     };
     
     template <typename T>
     Threadpool<T> * Threadpool<T>::_instance=nullptr;
+    template<typename T>
+    Mutex Threadpool<T>:: _lock;
 }
