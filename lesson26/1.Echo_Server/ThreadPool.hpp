@@ -16,7 +16,7 @@ using namespace ThreadModule;
 
 namespace ThreadPoolModule
 {
-    const static int defaultnum = 5;
+    const static int defaultnum = 10;
 
     template <typename T>
     class Threadpool
@@ -71,12 +71,11 @@ namespace ThreadPoolModule
             }
         }
 
+        // 单例模式不允许赋值和拷贝
+        Threadpool(const Threadpool<T> &pool) = delete;
+        Threadpool<T> &operator=(const Threadpool<T> &pool) = delete;
 
-        //单例模式不允许赋值和拷贝
-        Threadpool(const Threadpool<T> & pool)=delete;
-        Threadpool<T>& operator=(const Threadpool<T> & pool)=delete;
-
-        //单例模式还是需要构造函数初始化的
+        // 单例模式还是需要构造函数初始化的
         Threadpool(int num = defaultnum) : _thread_num(num),
                                            _wait_num(0),
                                            _isrunning(false)
@@ -86,30 +85,33 @@ namespace ThreadPoolModule
                 _threads.push_back(std::make_shared<Thread>(std::bind(&Threadpool::ExecuteTask, this, std::placeholders::_1)));
             }
         }
+
     public:
-        
-        static Threadpool<T>* CreateSingleThreadPool()
+        static Threadpool<T> *CreateSingleThreadPool()
         {
-            if(_instance==nullptr)
+            if (_instance == nullptr)
             {
-                //非静态变量是在函数执行期间在栈上分配内存的局部变量，其生命周期仅限于函数的执行期间。
-                //静态成员函数可以像普通函数一样在其内部创建和使用局部变量，包括非静态变量，因为这些变量的创建和使用并不依赖于对象的实例。
-                //核心就是静态成员函数里面变量和函数都不依赖this指针就行
-                LockGuard lcokguard(_lock);
-                if(_instance==nullptr)
+                // 非静态变量是在函数执行期间在栈上分配内存的局部变量，其生命周期仅限于函数的执行期间。
+                // 静态成员函数可以像普通函数一样在其内部创建和使用局部变量，包括非静态变量，因为这些变量的创建和使用并不依赖于对象的实例。
+                // 核心就是静态成员函数里面变量和函数都不依赖this指针就行
+                if (_instance == nullptr)
                 {
-                    _instance=new Threadpool<T> ();
-                    _instance->Start();
+                    LockGuard lockguard(_lock);
+                    if(_instance==nullptr)
+                    {
+                        _instance=new Threadpool<T> ();
+                        _instance->Start();
+                    }
                 }
             }
             return _instance;
         }
-        void Equeue(T &&t) // 任务进入队列的函数
+        void Equeue(const T&t) // 任务进入队列的函数
         {
             // 这个地方要访问临界资源，所以要加锁保护
             LockGuard lock(_mutex);
-            if(_isrunning==false)
-                return ;
+            if (_isrunning == false)
+                return;
             _tasks.push(move(t));
 
             if (_wait_num > 0)
@@ -123,21 +125,17 @@ namespace ThreadPoolModule
 
             if (_isrunning)
                 return;
-            //这里如果不加锁 && _isrunning 放到最后的话，就会产生问题
-            //因为线程是并发跑的，可能前一个线程刚启动的时候，就直接执行ExecuteTask
-            //但是ExecuteTask里面有if (IsEmpty() && !_isrunning) 就直接退出掉这个进程了
-            //解决办法：1、加锁  2、将_isrunning=true 放到if (_isrunning)后面
+            // 这里如果不加锁 && _isrunning 放到最后的话，就会产生问题
+            // 因为线程是并发跑的，可能前一个线程刚启动的时候，就直接执行ExecuteTask
+            // 但是ExecuteTask里面有if (IsEmpty() && !_isrunning) 就直接退出掉这个进程了
+            // 解决办法：1、加锁  2、将_isrunning=true 放到if (_isrunning)后面
             _isrunning = true;
-
 
             for (auto &e : _threads)
             {
                 e->Start();
                 LOG(LogLevel::DEBUG) << e->GetName() << " is start";
             }
-
-
-
         }
         void Wait() // 线程池等待函数
         {
@@ -168,6 +166,7 @@ namespace ThreadPoolModule
         ~Threadpool()
         {
         }
+
     private:
         int _thread_num;                               // 线程池里面的线程的个数
         int _wait_num;                                 // 有多少个线程在等待
@@ -178,14 +177,13 @@ namespace ThreadPoolModule
         std::queue<T> _tasks; // 任务队列 临界资源（多线程访问）
         Mutex _mutex;
         Cond _cond;
-        static Threadpool<T> * _instance;
-        static Mutex _lock;//用来保护单例的静态锁
-        
+        static Threadpool<T> *_instance;
+        static Mutex _lock; // 用来保护单例的静态锁
     };
-    
+
     template <typename T>
-    Threadpool<T> * Threadpool<T>::_instance=nullptr;
+    Threadpool<T> *Threadpool<T>::_instance = nullptr;
 
     template <typename t>
-    Mutex Threadpool<t>:: _lock;//定义一个全局的锁来保护单例
+    Mutex Threadpool<t>::_lock; // 定义一个全局的锁来保护单例
 }

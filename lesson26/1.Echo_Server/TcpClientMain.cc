@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
             char buff[1024];
             int m = ::read(sockfd, buff, sizeof(buff) - 1);
             buff[m] = 0;
-            LOG(LogLevel::INFO) << "client read: " << buff;
+            std::cout<<buff<<std::endl;
         }
     }
 }

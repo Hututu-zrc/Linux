@@ -14,10 +14,13 @@
 #include "Common.hpp"
 #include "InetAddr.hpp"
 #include "ThreadPool.hpp"
+#include "Command.hpp"
 
 #define BACKLOG 5
 using namespace LogModule;
 using namespace ThreadPoolModule;
+// handler_t 从client接收命令，然后解析，返回结构
+using handler_t = std::function<std::string(std::string)>;
 static const int gport = 8888;
 
 class TcpServer
@@ -32,12 +35,13 @@ public:
     // using func_t = std::function<void *(void *)>;
     using task_t = std::function<void()>;
 
-    TcpServer(int port = gport)
+    TcpServer(handler_t handler, int port = gport)
         : _listensockfd(-1),
           _port(port),
-
           _addr(_port),
-          _isrunning(false)
+          _isrunning(false),
+          _handler(handler)
+
     {
     }
     void InitServer()
@@ -70,19 +74,30 @@ public:
         LOG(LogLevel::INFO) << "HandlerRequest is sucess,sockfd: " << sockfd;
 
         char buff[1024];
+        // 长任务
         while (true)
         {
 
             memset(buff, 0, sizeof(buff));
-            int n = ::read(sockfd, buff, sizeof(buff) - 1);
-            LOG(LogLevel::INFO) << "buff: " << buff;
-            // read读不到数据的时候，返回-1，所以这里死循环
+
+            // 网络当中还有另一种读写的方式 recv && send接口
+            //  int n = ::read(sockfd, buff, sizeof(buff) - 1);//read不完善，eg：发了10byte，但是只读了5byte
+
+            ssize_t n = ::recv(sockfd, buff, sizeof(buff) - 1, 0);
+            // LOG(LogLevel::INFO) << "buff: " << buff;
+            //  read读不到数据的时候，返回-1，所以这里死循环
             if (n > 0)
             {
                 buff[n] = 0;
-                std::string echomessage("Echo# ");
-                echomessage += buff;
-                ::write(sockfd, echomessage.c_str(), echomessage.size());
+                // std::string echomessage("Echo# ");
+                // echomessage += buff;
+
+                // 这里读到数据以后，交给command处理
+                //对命令进行限制，只允许指定命令进入到_handler
+                //放到Command里面去，不要放到服务器上面判断
+                std::string ret = _handler(buff);
+                // ::write(sockfd, echomessage.c_str(), echomessage.size());//写入也是不完善的
+                ::send(sockfd, ret.c_str(), ret.size(), 0); // 写入也是不完善的
             }
             else if (n == 0)
             {
@@ -95,7 +110,7 @@ public:
             }
         }
         ::close(sockfd);
-        LOG(LogLevel::DEBUG) << "sockfd close,sockfd: " << sockfd;
+        // LOG(LogLevel::DEBUG) << "sockfd close,sockfd: " << sockfd;
     }
 
     // 这里出现的问题就是，静态类内函数没有this指针
@@ -186,9 +201,11 @@ public:
 
             // version_4 线程池版本
             // 这里的sockfd是赋值拷贝
+            // 线程池只适合短任务，不适合长任务
+
             Threadpool<task_t>::CreateSingleThreadPool()->Equeue([this, sockfd]()
                                                                  {
-                LOG(LogLevel::DEBUG)<<"lambda ";
+               // LOG(LogLevel::DEBUG)<<"lambda ";
                 this->HandlerRequest(sockfd); });
         }
         _isrunning = false;
@@ -210,4 +227,7 @@ private:
 
     Inet_addr _addr; // 服务器内部的属性
     bool _isrunning; // 判断服务器是否启动
+
+    // 处理上层任务的入口
+    handler_t _handler;
 };
