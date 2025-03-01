@@ -93,7 +93,7 @@ namespace ThreadPoolModule
             if(!Threadpool<T>::_instance)
             {
                 Threadpool<T>::_instance =new Threadpool<T>();
-                
+                _instance ->Start();
             }
             return _instance;
         }
@@ -101,6 +101,10 @@ namespace ThreadPoolModule
         {
             // 这个地方要访问临界资源，所以要加锁保护
             LockGuard lock(_mutex);
+            //这里要判断进程池是否是启动状态的的
+            if(_isrunning==false)
+                return ;
+            LOG(LogLevel::DEBUG)<<"Equeue";
             _tasks.push(move(t));
 
             if (_wait_num > 0)

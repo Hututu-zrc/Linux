@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
         // 3.1用户输入
 
         std::string input;
+        //recvfrom会阻塞等待，这里的please打印不出来
         cout << "Please# ";
         std::getline(std::cin, input);
 
