@@ -63,6 +63,7 @@ public:
     }
 
 private:
+    
     struct sockaddr_in _addr;
     std::string _ip;
     uint16_t _port;
