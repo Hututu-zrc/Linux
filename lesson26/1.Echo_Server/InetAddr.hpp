@@ -32,6 +32,7 @@ public:
         PortNetToHost();
         IpNetToHost();
     }
+    //下面的这个构造函数只适用于服务器初始化的时候
     Inet_addr(uint16_t port) : _port(port), _ip("")
     {
         _addr.sin_family = AF_INET;
