@@ -92,7 +92,7 @@ namespace ThreadPoolModule
         {
             if(_instance==nullptr)
             {
-                LockGuard lcokguard(_mutex);
+                LockGuard lockguard(_lock);
                 if(_instance==nullptr)
                 {
                     _instance=new Threadpool<T> ();
@@ -176,10 +176,13 @@ namespace ThreadPoolModule
         Mutex _mutex;
         Cond _cond;
         static Threadpool<T> * _instance;
+        static Mutex _lock;
 
         
     };
     
     template <typename T>
     Threadpool<T> * Threadpool<T>::_instance=nullptr;
+    template<typename T>
+    Mutex Threadpool<T>:: _lock;
 }
