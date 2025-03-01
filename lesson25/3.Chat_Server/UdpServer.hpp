@@ -171,8 +171,10 @@ public:
             // 这里是简单的分发任务
 
             task_t f = std::bind(_route, _socket_fd, echo_message);
+            LOG(LogLevel::DEBUG)<<"Udpserver Equeue";
+
             Threadpool<task_t>::CreateSingleThreadPool()->Equeue(f);
-            _route(_socket_fd, echo_message);
+            //_route(_socket_fd, echo_message);
             // ssize_t m = ::sendto(_socket_fd, echo_message.c_str(), echo_message.size(), 0, CONV(&peer), sizeof(peer));
             // if (m < 0)
             // {
