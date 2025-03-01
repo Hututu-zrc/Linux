@@ -42,13 +42,13 @@ namespace LogModule
         ConsoleStrategy() {}
         virtual void SyncLog(const std::string &message) override
         {
-            LockGuard lock(_mutex);
+            MutexModule::LockGuard lock(_mutex);
             std::cout << message << std::endl;
         }
         ~ConsoleStrategy() {}
 
     private:
-        Mutex _mutex;
+        MutexModule::Mutex _mutex;
     };
     //      文件刷新要主要路径和名称
     const std::string DefaultFilePath = "./log/";
@@ -61,12 +61,12 @@ namespace LogModule
             : _logpath(logpath),
               _logfilename(logfilename)
         {
-            LockGuard lock(_mutex);
+            MutexModule::LockGuard lock(_mutex);
             if (std::filesystem::exists(_logpath))
             {
                 return;
             }
-            //std::cout<<"return "<<std::endl;
+            // std::cout<<"return "<<std::endl;
             try
             {
                 // 可能创建不成功，这使用try-catch捕捉
@@ -98,14 +98,13 @@ namespace LogModule
             {
                 return;
             }
-        
         }
         ~FileStrategy() {}
 
     private:
         std::string _logpath;     // 文件的存放路径
         std::string _logfilename; // 文件的名字
-        Mutex _mutex;
+        MutexModule::Mutex _mutex;
     };
 
     // 3.日志的主体部分日志类
@@ -117,8 +116,8 @@ namespace LogModule
         struct tm *Localtime = localtime(&currentTime);
         char buff[1024];
         snprintf(buff, sizeof(buff), "%04d-%02d-%02d %02d:%02d:%02d",
-                 Localtime->tm_year+1900,
-                 Localtime->tm_mon+1,
+                 Localtime->tm_year + 1900,
+                 Localtime->tm_mon + 1,
                  Localtime->tm_mday,
                  Localtime->tm_hour,
                  Localtime->tm_min,
@@ -153,15 +152,14 @@ namespace LogModule
         Logger() : _strategy(std::make_unique<ConsoleStrategy>())
         {
         }
-        //创建两个函数用来改变刷新策略
+        // 创建两个函数用来改变刷新策略
         void UseFileSrategy()
         {
-            _strategy=std::make_unique<FileStrategy>();
-
+            _strategy = std::make_unique<FileStrategy>();
         }
         void UseConsoleStrategy()
         {
-            _strategy=std::make_unique<ConsoleStrategy>();
+            _strategy = std::make_unique<ConsoleStrategy>();
         }
         ~Logger() {}
 
@@ -233,9 +231,9 @@ namespace LogModule
     };
 
     Logger logger;
-    //创建logger变量，然后宏替换
-    #define LOG(type) logger(type, __FILE__, __LINE__)
-    #define ENABLE_CONSOLE_LOG() logger.UseConsoleStrategy()
-    #define ENABLE_FILE_LOG() logger.UseFileSrategy()
+// 创建logger变量，然后宏替换
+#define LOG(type) logger(type, __FILE__, __LINE__)
+#define ENABLE_CONSOLE_LOG() logger.UseConsoleStrategy()
+#define ENABLE_FILE_LOG() logger.UseFileSrategy()
 
 }
