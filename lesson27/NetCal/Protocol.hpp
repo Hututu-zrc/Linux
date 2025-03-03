@@ -10,4 +10,5 @@ class Request
 
 class Response
 {
+    Response(){}
 };
