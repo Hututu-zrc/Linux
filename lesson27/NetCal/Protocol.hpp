@@ -1,8 +1,11 @@
-#pragma once 
+#pragma once
 
 #include <iostream>
 
+class Request
+{
+};
 
-class Request{
-
+class Response
+{
 };
