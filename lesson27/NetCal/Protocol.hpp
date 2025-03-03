@@ -4,6 +4,7 @@
 
 class Request
 {
+    Request(){}
 };
 
 class Response
