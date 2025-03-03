@@ -1,5 +1,6 @@
 #pragma once
 
+<<<<<<< HEAD
 #include <jsoncpp/json/json.h>
 
 #include <memory>
@@ -115,10 +116,19 @@ private:
     int _x;
     int _y;
     char _oper;
+=======
+#include <iostream>
+
+class Request
+{
+    Request(){}
+    ~Request(){}
+>>>>>>> afbd0b48740a396b6a0b4db5e69a1e611f8a1315
 };
 
 class Response
 {
+<<<<<<< HEAD
 public:
     Response() {}
     bool Serialize(const std::string &Outstring)
@@ -155,4 +165,7 @@ public:
 private:
     int _result;
     int _code; // 标识传输是否出错误
+=======
+    Response(){}
+>>>>>>> afbd0b48740a396b6a0b4db5e69a1e611f8a1315
 };
