@@ -5,6 +5,7 @@
 class Request
 {
     Request(){}
+    ~Request(){}
 };
 
 class Response
