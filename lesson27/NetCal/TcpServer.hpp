@@ -14,13 +14,12 @@
 #include "Common.hpp"
 #include "InetAddr.hpp"
 #include "ThreadPool.hpp"
-#include "Command.hpp"
+#include "Protocol.hpp"
 
 #define BACKLOG 5
 using namespace LogModule;
 using namespace ThreadPoolModule;
-// handler_t 从client接收命令，然后解析，返回结构
-using handler_t = std::function<std::string(std::string)>;
+using handler_t = std::function<std::string(std::string &)>;
 static const int gport = 8888;
 
 class TcpServer
@@ -74,28 +73,23 @@ public:
         LOG(LogLevel::INFO) << "HandlerRequest is sucess,sockfd: " << sockfd;
 
         char buff[1024];
+        std::string package; // 数据报文
         // 长任务
         while (true)
         {
-
             memset(buff, 0, sizeof(buff));
-
-            // 网络当中还有另一种读写的方式 recv && send接口
-            //  int n = ::read(sockfd, buff, sizeof(buff) - 1);//read不完善，eg：发了10byte，但是只读了5byte
-
             ssize_t n = ::recv(sockfd, buff, sizeof(buff) - 1, 0);
-            // LOG(LogLevel::INFO) << "buff: " << buff;
-            //  read读不到数据的时候，返回-1，所以这里死循环
             if (n > 0)
             {
                 buff[n] = 0;
-                // std::string echomessage("Echo# ");
-                // echomessage += buff;
+                package+=buff;
+              
+                
+                
+                std::string ret = _handler(package);
+                // 判断数据报是否完整，不完整的话，直接退出，接着读取
+                if(ret.empty()) continue;
 
-                // 这里读到数据以后，交给command处理
-                //对命令进行限制，只允许指定命令进入到_handler
-                //放到Command里面去，不要放到服务器上面判断
-                std::string ret = _handler(buff);
                 // ::write(sockfd, echomessage.c_str(), echomessage.size());//写入也是不完善的
                 ::send(sockfd, ret.c_str(), ret.size(), 0); // 写入也是不完善的
             }

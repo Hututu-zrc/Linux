@@ -1,6 +1,5 @@
 #pragma once
 
-<<<<<<< HEAD
 #include <jsoncpp/json/json.h>
 
 #include <memory>
@@ -10,57 +9,56 @@
 
 const std::string Sep = "\r\n";
 
-
-//给序列化的message添加报头
-//格式：报头+Sep+message+Sep
-bool Encode(std::string & message)
+// 给序列化的message添加报头
+// 格式：报头+Sep+message+Sep
+bool Encode(std::string &message)
 {
-    if(message.size()==0)   return false;
-    std::string package=std::to_string(message.size())+Sep+message+Sep;
-    message=package;
+    if (message.size() == 0)
+        return false;
+    std::string package = std::to_string(message.size()) + Sep + message + Sep;
+    message = package;
     return true;
 }
 
-//len \r\n Json \r\n len \r\n Json \r\n
-//package是输入的参数，是报文
-//context是输出型参数，是数据报
-bool Decode(std::string &package,std::string *context)
+// len \r\n Json \r\n len \r\n Json \r\n
+// package是输入的参数，是报文
+// context是输出型参数，是数据报
+bool Decode(std::string &package, std::string *context)
 {
-    //首先判断长度
-    auto pos=package.find(Sep);
-    if(pos==std::string::npos)   return false;
-
-    //拿到报头的数据
-    std::string context_length_str=package.substr(0,pos);
-
-    //报头的数据就是数据部分的长度
-    int context_length=std::stoi(context_length_str);
-    //记录整个报文的长度
-    int full_length = context_length_str.size() + context_length + 2*Sep.size();
-    //package长度不够所有的长度，直接返回false
-    if(package.size()<full_length)
+    // 首先判断长度
+    auto pos = package.find(Sep);
+    if (pos == std::string::npos)
         return false;
 
-    //拿出数据部分
-    *context=package.substr(pos+Sep.size(),context_length);
+    // 拿到报头的数据
+    std::string context_length_str = package.substr(0, pos);
 
-    //将得到的第一个报文删除掉
-    package.erase(0,full_length);
+    // 报头的数据就是数据部分的长度
+    int context_length = std::stoi(context_length_str);
+    // 记录整个报文的长度
+    int full_length = context_length_str.size() + context_length + 2 * Sep.size();
+    // package长度不够所有的长度，直接返回false
+    if (package.size() < full_length)
+        return false;
 
+    // 拿出数据部分
+    *context = package.substr(pos + Sep.size(), context_length);
 
+    // 将得到的第一个报文删除掉
+    package.erase(0, full_length);
+    return true;
 }
-
 
 class Request
 {
 public:
-    Request(int x, int y, char oper)
+    Request(int x = 0, int y = 0, char oper = 0)
         : _x(x),
           _y(y),
           _oper(oper)
     {
     }
-    bool Serialize( std::string &Outstring)
+    bool Serialize(std::string &Outstring)
     {
         // Josn的本质是键值对记录数据的
         Json::Value root;
@@ -81,7 +79,7 @@ public:
         w->write(root, &ss);
 
         // std::cout << ss.str() << std::endl;
-        Outstring=ss.str();
+        Outstring = ss.str();
         return true;
     }
     bool Deserialize(const std::string &Instring)
@@ -107,30 +105,25 @@ public:
         std::cout << _y << std::endl;
         std::cout << _oper << std::endl;
     }
-    int GetX() { return _x; };
-    int GetY() { return _y; };
-    char GetOper() { return _oper; };
+    int GetX() const { return _x; };
+    int GetY() const { return _y; };
+    char GetOper() const { return _oper; };
     ~Request() {}
 
 private:
     int _x;
     int _y;
     char _oper;
-=======
-#include <iostream>
-
-class Request
-{
-    Request(){}
-    ~Request(){}
->>>>>>> afbd0b48740a396b6a0b4db5e69a1e611f8a1315
 };
 
 class Response
 {
-<<<<<<< HEAD
 public:
-    Response() {}
+    Response(int result = 0)
+        : _result(result),
+          _code(0)
+    {
+    }
     bool Serialize(const std::string &Outstring)
     {
         Json::Value root;
@@ -159,13 +152,13 @@ public:
 
         return true;
     }
-    int GetResult() { return _result; }
+    int GetResult() const { return _result; }
+    int GetCode() const { return _code; }
+    void SetResult(int result) { _result = result; }
+    void SetCode(int code) { _code = code; };
     ~Response() {}
 
 private:
     int _result;
     int _code; // 标识传输是否出错误
-=======
-    Response(){}
->>>>>>> afbd0b48740a396b6a0b4db5e69a1e611f8a1315
 };
