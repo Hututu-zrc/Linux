@@ -3,14 +3,17 @@
 #include "Prase.hpp"
 #include <memory>
 #include <iostream>
-
+#include "Daemon.hpp"
 // 这一层就属于中间层
 // 负责对于报文进行判断，传递给calculate
 // 然后拿到calculate返回的数据进行封装成报文
 
 int main()
 {
-
+    ENABLE_FILE_LOG();
+    //ENABLE_CONSOLE_LOG();
+    //变为守护进程
+    //Daemon(false,false);
     // 最上层，只负责计算就行
     std::unique_ptr<Calculator> cal = std::make_unique<Calculator>();
 

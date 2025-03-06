@@ -79,26 +79,26 @@ public:
         {
             memset(buff, 0, sizeof(buff));
             ssize_t n = ::recv(sockfd, buff, sizeof(buff) - 1, 0);
-            LOG(LogLevel::DEBUG)<<"recv";
+            // LOG(LogLevel::DEBUG)<<"recv";
 
             if (n > 0)
             {
                 buff[n] = 0;
-                LOG(LogLevel::DEBUG)<<"buff: "<<buff;
+                // LOG(LogLevel::DEBUG)<<"buff: "<<buff;
                 
                 package+=buff;
               
                 
                 
                 std::string ret = _handler(package);
-                LOG(LogLevel::DEBUG)<<"before ret";
+                // LOG(LogLevel::DEBUG)<<"before ret";
 
                 // 判断数据报是否完整，不完整的话，直接退出，接着读取
                 if(ret.empty()) continue;
-                LOG(LogLevel::DEBUG)<<"after ret";
+                // LOG(LogLevel::DEBUG)<<"after ret";
                 // ::write(sockfd, echomessage.c_str(), echomessage.size());//写入也是不完善的
                 ::send(sockfd, ret.c_str(), ret.size(), 0); // 写入也是不完善的
-                LOG(LogLevel::DEBUG)<<"send";
+                // LOG(LogLevel::DEBUG)<<"send";
             }
             else if (n == 0)
             {

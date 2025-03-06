@@ -40,17 +40,17 @@ public:
             resp.Serialize(ret);
             LOG(LogLevel::DEBUG)<<"serialize: "<<ret;
             
-            LOG(LogLevel::DEBUG)<<"result: "<<resp.GetResult();
+            //LOG(LogLevel::DEBUG)<<"result: "<<resp.GetResult();
             
             // 5、封装包头
             Encode(ret);
-            LOG(LogLevel::DEBUG)<<"ret: "<<ret;
+            //LOG(LogLevel::DEBUG)<<"ret: "<<ret;
 
             res += ret;
-            LOG(LogLevel::DEBUG)<<"res: "<<res;
+            //LOG(LogLevel::DEBUG)<<"res: "<<res;
 
         }
-        LOG(LogLevel::DEBUG)<<"PraseMessage";
+        //LOG(LogLevel::DEBUG)<<"PraseMessage";
         LOG(LogLevel::DEBUG)<<"res: "<<res;
 
         return res;
