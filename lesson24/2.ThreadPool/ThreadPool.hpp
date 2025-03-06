@@ -86,8 +86,8 @@ namespace ThreadPoolModule
         {
             // 这个地方要访问临界资源，所以要加锁保护
             LockGuard lock(_mutex);
-            if(_isrunning==false)
-                return ;
+            if (_isrunning == false)
+                return;
             _tasks.push(move(t));
 
             if (_wait_num > 0)
@@ -101,21 +101,17 @@ namespace ThreadPoolModule
 
             if (_isrunning)
                 return;
-            //这里如果不加锁 && _isrunning 放到最后的话，就会产生问题
-            //因为线程是并发跑的，可能前一个线程刚启动的时候，就直接执行ExecuteTask
-            //但是ExecuteTask里面有if (IsEmpty() && !_isrunning) 就直接退出掉这个进程了
-            //解决办法：1、加锁  2、将_isrunning=true 放到if (_isrunning)后面
+            // 这里如果不加锁 && _isrunning 放到最后的话，就会产生问题
+            // 因为线程是并发跑的，可能前一个线程刚启动的时候，就直接执行ExecuteTask
+            // 但是ExecuteTask里面有if (IsEmpty() && !_isrunning) 就直接退出掉这个进程了
+            // 解决办法：1、加锁  2、将_isrunning=true 放到if (_isrunning)后面
             _isrunning = true;
-
 
             for (auto &e : _threads)
             {
                 e->Start();
                 LOG(LogLevel::DEBUG) << e->GetName() << " is start";
             }
-
-
-
         }
         void Wait() // 线程池等待函数
         {
