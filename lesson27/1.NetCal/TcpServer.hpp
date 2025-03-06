@@ -16,7 +16,7 @@
 #include "ThreadPool.hpp"
 #include "Protocol.hpp"
 
-#define BACKLOG 5
+#define BACKLOG 8
 using namespace LogModule;
 using namespace ThreadPoolModule;
 using handler_t = std::function<std::string(std::string &)>;
