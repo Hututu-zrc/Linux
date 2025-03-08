@@ -26,12 +26,15 @@ public:
             if (!Decode(package, &context))
                 break;
             LOG(LogLevel::DEBUG)<<"context: "<<context;
+
             //1.1、判断返回的context是否为空
             if(context.empty()) break;
+
             // 2、将我们拿到的数据段放入进行反序列化
             Request req;
             if (!req.Deserialize(context))
                 break;
+                
             // 3、交给我们的calculate计算层,并保存返回值
             Response resp;
             resp = _cal(req);

@@ -58,7 +58,9 @@ public:
           _oper(oper)
     {
     }
-    bool Serialize(std::string &Outstring)
+
+    //这里的请求序列化，主要是给客户端使用的
+    bool Serialize(std::string &Outstring) 
     {
         // Josn的本质是键值对记录数据的
         Json::Value root;
@@ -82,7 +84,9 @@ public:
         Outstring = ss.str();
         return true;
     }
-    bool Deserialize(const std::string &Instring)
+    
+    //这里的请求反序列化，主要是给服务器使用的，服务器从网络拿到字节流后发序列化出来数据
+    bool Deserialize(const std::string &Instring) 
     {
         Json::Value root;
         Json::Reader reader;
@@ -124,6 +128,8 @@ public:
           _code(0)
     {
     }
+
+    //服务器计算完了以后，将数据序列化后传输至网络
     bool Serialize( std::string &Outstring)
     {
         Json::Value root;
@@ -138,6 +144,8 @@ public:
         // std::cout << ss.str() << std::endl;
         return true;
     }
+
+    //客户端收到以后，进行反序列化，打印出来
     bool Deserialize(const std::string &Instring)
     {
         Json::Value root;
