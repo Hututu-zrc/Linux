@@ -56,15 +56,8 @@ namespace TcpServerModule
                 {
                     //关闭多余的文件描述符
                     _socket->Close();
-                    
-                    // std::string message;
-                    // sockfd->Recv(&message);
-
-
-                    // _handler(sockfd,);
                     //处理方法处理以后，返回信息
                     _handler(sockfd,Client);
-                    // sockfd->Send(sockfd->GetFd(),);
                     exit(0);
 
                 }

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - 页面迷失在宇宙中</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e6f2ff; /* 淡蓝色背景 */
+            color: #333; /* 深灰色文字 */
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .error-code {
+            font-size: 180px;
+            font-weight: bold;
+            color: #87CEEB; /* 蓝色数字 */
+            text-shadow: 0 0 10px rgba(135, 206, 250, 0.7);
+            margin-bottom: 20px;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .error-code span {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .error-code span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .error-code span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .error-code span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .error-message {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #333;
+            text-shadow: 0 0 5px rgba(135, 206, 250, 0.5);
+            z-index: 1;
+            position: relative;
+        }
+        
+        .description {
+            font-size: 20px;
+            max-width: 600px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #555;
+            line-height: 1.6;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 18px;
+            background-color: #87CEEB; /* 蓝色按钮 */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(135, 206, 250, 0.4);
+            z-index: 1;
+            position: relative;
+        }
+        
+        .button:hover {
+            background-color: #4a90e2;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(135, 206, 250, 0.6);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .search-box {
+            margin-top: 50px;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 12px 20px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .search-box button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #87CEEB;
+            cursor: pointer;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-code">
+            <span>4</span><span>0</span><span>4</span>
+        </div>
+        
+        <h1 class="error-message">页面迷失在宇宙中</h1>
+        
+        <p class="description">您要找的页面似乎在宇宙的另一端，让我们返回首页继续探索吧。</p>
+        
+        <a href="/" class="button">返回首页</a>
+        
+        <div class="search-box">
+            <input type="text" placeholder="或者在这里搜索您需要的内容...">
+            <button>搜索</button>
+        </div>
+    </div>
+</body>
+</html>

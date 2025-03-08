@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "TcpServer.hpp"
+#include "HttpProtocol.hpp"
 
 using namespace TcpServerModule;
 class HttpServer
@@ -25,8 +26,38 @@ public:
     bool HandlerRequest(SockPtr sockfd, Inet_addr client)
     {
         LOG(LogLevel::DEBUG) << "get a new client:" << client.GetIp();
+        std::string http_request;
+        sockfd->Recv(&http_request); // 不做完整性分析，太麻烦，主要是了解http的过程即可
+        HttpRequest req;
+        req.Deserialize(http_request);
+        req.Print();
+
+        HttpResponse resp;
+        resp.Build(req);
+        std::string resp_str;
+        resp.Serialize(&resp_str);
+        sockfd->Send(resp_str);
+
+        // 读取请求，对请求进行分析处理 --->文本处理
+        // 1、读取请求的完整性 ---暂时不做
+        // 2、完成http序列化和，http response序列化
+
+        // // demo 1 :直接返回一个固定的内容
+        // std::string status_line = "HTTP/1.1 200 OK" + Sep + BlankLine;
+        // std::string body = "<!DOCTYPE html>\
+        // <html>\
+        // <head>\
+        // <meta charset=\"UTF-8\">\
+        // <title>Hello World</title>\
+        // </head>\
+        // <body>\
+        // <h1>Hello World</h1>\
+        // </body>\
+        // </html>";
+        // std::string httpresponse = status_line + body;
+        // sockfd->Send(httpresponse);
         return true;
-    }   
+    }
 
     ~HttpServer() {}
 

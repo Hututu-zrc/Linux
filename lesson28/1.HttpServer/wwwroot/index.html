@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精品商城 - 您的在线购物天堂</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        /* 头部导航 */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #007bff;
+        }
+        
+        .search-cart {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-right: 20px;
+        }
+        
+        .search-box input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+        }
+        
+        .search-box button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .cart-icon {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        /* 主横幅 */
+        .hero {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 80px 5%;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #fff;
+            color: #007bff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 分类区域 */
+        .categories {
+            padding: 50px 5%;
+            background-color: #f8f9fa;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: #333;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .category-card {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .category-img {
+            height: 180px;
+            background-color: #eee;
+        }
+        
+        .category-info {
+            padding: 20px;
+        }
+        
+        .category-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .category-info p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 热门商品 */
+        .products {
+            padding: 50px 5%;
+            background-color: #fff;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .product-card {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-img {
+            height: 220px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .product-info .price {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .product-info .rating {
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+        
+        .product-info .add-to-cart {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .product-info .add-to-cart:hover {
+            background-color: #0056b3;
+        }
+        
+        /* 页脚 */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 50px 5% 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: #fff;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="navbar">
+            <a href="#" class="logo">精品商城</a>
+            <ul class="nav-links">
+                <li><a href="#">首页</a></li>
+                <li><a href="#">分类</a></li>
+                <li><a href="#">新品上市</a></li>
+                <li><a href="/login.html">登录</a></li>
+                <li><a href="/register.html">注册</a></li>
+            </ul>
+            <div class="search-cart">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索商品...">
+                    <button>🔍</button>
+                </div>
+                <a href="#" class="cart-icon">🛒</a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主横幅 -->
+    <section class="hero">
+        <h1>发现生活之美</h1>
+        <p>数万种精品好物，满足您的每一个需求，让生活更加美好</p>
+        <a href="#" class="cta-button">立即购物</a>
+    </section>
+    
+    <!-- 分类区域 -->
+    <section class="categories">
+        <h2 class="section-title">商品分类</h2>
+        <div class="category-grid">
+            <div class="category-card">
+                <div class="category-img"></div>
+                <div class="category-info">
+                    <h3>电子产品</h3>
+                    <p>手机、电脑、智能设备</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <div class="category-img"></div>
+                <div class="category-info">
+                    <h3>家居生活</h3>
+                    <p>家具、装饰、生活用品</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <div class="category-img"></div>
+                <div class="category-info">
+                    <h3>时尚服饰</h3>
+                    <p>男女装、鞋包、配饰</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <div class="category-img"></div>
+                <div class="category-info">
+                    <h3>美妆护肤</h3>
+                    <p>护肤品、彩妆、工具</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 热门商品 -->
+    <section class="products">
+        <h2 class="section-title">热门推荐</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-info">
+                    <h3>高端智能手机</h3>
+                    <div class="price">¥3999</div>
+                    <div class="rating">★★★★★</div>
+                    <a href="#" class="add-to-cart">加入购物车</a>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-info">
+                    <h3>无线蓝牙耳机</h3>
+                    <div class="price">¥599</div>
+                    <div class="rating">★★★★☆</div>
+                    <a href="#" class="add-to-cart">加入购物车</a>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-info">
+                    <h3>智能手表</h3>
+                    <div class="price">¥899</div>
+                    <div class="rating">★★★★★</div>
+                    <a href="#" class="add-to-cart">加入购物车</a>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img"></div>
+                <div class="product-info">
+                    <h3>便携蓝牙音箱</h3>
+                    <div class="price">¥299</div>
+                    <div class="rating">★★★★☆</div>
+                    <a href="#" class="add-to-cart">加入购物车</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 页脚 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>关于我们</h3>
+                <ul>
+                    <li><a href="#">公司简介</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><a href="#">招贤纳士</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>客户服务</h3>
+                <ul>
+                    <li><a href="#">帮助中心</a></li>
+                    <li><a href="#">售后服务</a></li>
+                    <li><a href="#">在线客服</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>商家合作</h3>
+                <ul>
+                    <li><a href="#">入驻须知</a></li>
+                    <li><a href="#">运营支持</a></li>
+                    <li><a href="#">商家后台</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>关注我们</h3>
+                <ul>
+                    <li><a href="#">微信公众号</a></li>
+                    <li><a href="#">微博</a></li>
+                    <li><a href="#">小红书</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2023 精品商城 版权所有 | 隐私政策 | 沪ICP备12345678号</p>
+        </div>
+    </footer>
+</body>
+</html>

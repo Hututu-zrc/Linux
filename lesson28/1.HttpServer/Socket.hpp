@@ -50,7 +50,7 @@ namespace SocketModule
         }
         void SocketOrDie() override
         {
-            _sockfd = ::socket(AF_INET, SOCK_DGRAM, 0);
+            _sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
             if (_sockfd < 0)
             {
                 LOG(LogLevel::FATAL) << strerror(errno);
