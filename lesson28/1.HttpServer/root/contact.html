@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人网站 - 联系我</title>
+    <link rel="stylesheet" href="./css/style.css">
+	<link rel="preload" href="game1.html" as="document">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html" >首页</a></li>
+                <li><a href="about.html" >关于我</a></li>
+                <li><a href="projects.html" >项目</a></li>
+                <li class="dropdown">
+                    <a href="blog.html" >博客</a>
+                    <!-- 博客的二级菜单 -->
+                    <div class="dropdown-content">
+                        <a href="https://blog.csdn.net/zmj_1318506938?type=blog" target="_blank">CSDN</a>
+                        <a href="https://www.cnblogs.com/zmj-Metaverse" target="_blank">博客园</a>
+                    </div>
+                </li>
+                <li><a href="contact.html">联系我</a></li>
+                <li><a href="game1.html" >小游戏</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="video-container">
+            <video autoplay muted loop>
+                <source src="vedio/Main.mp4" type="video/mp4">
+            </video>
+        </div>
+        <section>
+            <h2>您的信息</h2>
+            <form id="contact-form">
+                <label for="name">姓名:</label>
+                <input type="text" id="name" name="name" placeholder="请输入您的姓名" required>
+                <label for="email">邮箱:</label>
+                <input type="email" id="email" name="email" placeholder="请您输入由大小写字母、数字、点（.）、下划线（_）、连字符（-）组成的邮箱账号" required>
+                <label for="message">电话信息:</label>
+                <input id="message" name="message" placeholder="请您输入由 10 到 15 个数字组成的电话号码" required></input>
+                <button type="submit">提交</button>
+            </form>
+			
+            <h3>我的联系方式</h3>
+            <p><span class="icon icon-email"></span> <a href="mailto:1318506938@qq.com">1318506938@qq.com</a></p>
+            <p><span class="icon icon-phone"></span> <a href="tel:19546879830">19546879830</a></p>
+			<p id="location"><span class="icon icon-location"></span> <a href="#map-container">中国，湖北黄石</a></p>
+			<div class="map-container"  id="map-container-1">
+			    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9992041703973!2d2.2944813156747476!3d48.858370079287504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66fef2e6aab3b%3A0x421b1c7527fe1cb7!2sEiffel+Tower!5e0!3m2!1sen!2sfr!4v1512758226044" width="600" height="450" style="border:0" allowfullscreen></iframe>
+			</div>
+			<div class="map-container" id="map-container-2" style="display:none;">
+			    <iframe id="map-frame" width="600" height="450" style="border:0" allowfullscreen></iframe>
+			</div>
+
+            <h3>常见问题</h3>
+            <div class="faq">
+                <h4>问: 您如何联系我?</h4>
+                <p>答: 您可以通过页面上坊的电话、邮箱或电话与我联系。</p>
+                <h4>问: 我提供哪些服务?</h4>
+                <p>答: 我提供unity开发、网页开发、应用程序开发等技术服务。</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>©*** 2024 个人网站. 版权所有.</p>
+    </footer>
+    <script src="js/effect.js"></script>
+	<script src="js/contact.js"></script>
+</body>
+</html>

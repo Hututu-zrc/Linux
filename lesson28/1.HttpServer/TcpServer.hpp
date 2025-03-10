@@ -33,6 +33,7 @@ namespace TcpServerModule
         //假设我们把tcphandler_t放到构造函数当中，那么上层构造TcpServer的时候就需要传入回调函数指针
         //这不太方便，所以着初始化函数诞生了
 
+        //注册处理函数
         void InitTcpServer(tcphandler_t handler)
         {
             _handler=handler;
@@ -50,7 +51,7 @@ namespace TcpServerModule
                     continue;
                 }
 
-                // 实现IO
+                // 实现调用IO的接口
                 pid_t pid=fork();
                 if (pid == 0)
                 {
@@ -74,6 +75,6 @@ namespace TcpServerModule
         int _port;
         std::unique_ptr<Socket> _socket;
         
-        tcphandler_t _handler;
+        tcphandler_t _handler;//处理函数
     };
 }

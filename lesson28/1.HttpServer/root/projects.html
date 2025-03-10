@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目</title>
+        <link rel="stylesheet"  href="./css/projects.css"> 
+		<link rel="preload" href="blog.html" as="document">
+</head>
+<body>
+	<div class="video-container">
+	    <video id="bg-video" autoplay muted loop preload="none">
+	    <source src="vedio/Main.mp4" type="video/mp4">
+		</video>
+	</div>
+<header>
+	<nav>
+			<ul>
+				<li><a href="index.html" >首页</a></li>
+				<li><a href="about.html" >关于我</a></li>
+				<li><a href="projects.html">项目</a></li>
+				<li class="dropdown">
+					<a href="blog.html" >博客</a>
+					<div class="dropdown-content">
+						<a href="https://blog.csdn.net/zmj_1318506938?type=blog" target="_blank">CSDN</a>
+						<a href="https://www.cnblogs.com/zmj-Metaverse" target="_blank">博客园</a>
+					</div>
+				</li>
+				<li><a href="contact.html" >联系我</a></li>
+				<li><a href="game1.html" >小游戏</a></li>
+			</ul>
+		</nav>
+</header>
+<main>
+	<section id="projects-list">
+		<div class="project">
+			<h2>VR 密室逃脱游戏</h2>
+			<img src="img/2112.gif" alt="项目1图片" class="profile-img" loading="lazy">
+			<p>项目简介
+				<ul>
+					本项目旨在开发一款沉浸式的 VR 密室逃脱游戏，玩家需要通过解决一系列的谜题和挑战来逃出多个不同的密室。
+					游戏中包含了多种互动元素，如手柄控制、射线发射、物品拾取和使用等，让玩家能够充分体验 VR 环境下的互动乐趣。
+				</ul>
+			</p>
+			
+			<p>关键技术
+				<ul>
+					<li><strong>Unity:</strong> 游戏引擎，用于创建和设计 VR 游戏场景和逻辑</li>
+					<li><strong>Pico SDK: </strong>提供对 Pico VR 设备的支持，包括手柄输入和设备控制</li>
+					<li><strong>Audio Tools:</strong> 用于制作和编辑游戏音效和背景音乐。</li>
+				</ul>
+			</p>
+			
+			
+			<button class="toggle-btn" onclick="toggleCategoryVisibility(this)">项目架构</button>
+			<div class="category">
+				<p>基础设施</p>
+				<ul>
+					<li><strong>PXRManager:</strong> 管理和初始化 Pico SDK 相关功能，包括设备连接和设置。</li>
+					<li><strong>XR 场景:</strong> 创建和管理 XR 环境，处理场景中的各类 VR 交互。</li>
+					<li><strong>UI Canvas:</strong> 管理和显示用户界面元素，处理手柄输入和交互。</li>
+				</ul>
+				<p >游戏逻辑</p>
+				<ul>
+					<li><strong>输入控制:</strong> 获取并处理手柄输入，支持手柄按钮和摇杆操作。处理玩家移动、跳跃和旋转逻辑。</li>
+					<li><strong>射线管理:</strong> 实现射线发射逻辑，用于交互和检测物体。管理射线碰撞事件和触发相应的游戏行为。</li>
+				</ul>
+
+				<p>互动系统</p>
+				<ul>
+					<li><strong>物品拾取和使用:</strong> 实现物品拾取、放置和使用逻辑，如捡起钥匙、使用医疗箱等。</li>
+					<li><strong>手枪和射击:</strong> 实现手枪射击逻辑，包括射线射击、子弹生成和射击特效。</li>
+					<li><strong>敌人管理:</strong> 创建敌人管理器，控制敌人的生成、移动和攻击逻辑。实现敌人受伤和死亡的处理逻辑。</li>
+				</ul>
+
+				<p>场景管理</p>
+				<ul>
+					<li><strong>关卡搭建:</strong> 创建多个不同场景关卡，包括主界面和各个密室场景。配置场景切换逻辑，实现不同关卡之间的无缝衔接。</li>
+					<li><strong>动画和特效:</strong> 制作各类动画效果，如开门、物体移动和渐变黑屏等。管理场景中的特效，如射击特效、敌人攻击和玩家受伤特效。</li>
+				</ul>
+				
+				<p>用户体验</p>
+				<ul>
+					<li><strong>启动画面和淡入淡出效果:</strong> 提供友好的用户体验，提升沉浸感。</li>
+					<li><strong>静态注视点渲染:</strong> 优化渲染性能，确保流畅的游戏体验。</li>
+					<li><strong>VR 合成层模式:</strong> 支持多种 VR 渲染模式，提升视觉效果。</li>
+				</ul>
+			</div>
+		</div>
+		
+		<div class="project">
+			<h2>无限世界</h2>
+			<img src="img/2112.gif" alt="项目2" class="profile-img" loading="lazy">
+			<p>项目简介
+				<ul>
+					《无限世界》是一款采用先进的程序生成技术打造的开放世界冒险游戏。在这个游戏中，玩家将探索一个理论上无限大的游戏世界，
+					每次启动都会生成独特的地形、生物和任务，为玩家提供无穷的探索乐趣和挑战。
+				</ul>
+			</p>
+			<p>关键技术
+				<ul>
+					<li><strong>程序生成地图: </strong> 通过算法生成无限多样的地形和生态系统，确保每次游戏体验都是独一无二的。</li>
+					<li><strong>种子系统: </strong> 确保相同的种子值可以生成相同的世界，玩家可以分享自己的种子值，让其他玩家体验相同的世界配置。</li>
+					<li><strong>深度的制作与建造系统: </strong> 提供直观的制作菜单和建造界面，让玩家能够轻松制作各种武器、盔甲和建筑物，实现创意的自由表达。</li>
+					<li><strong>动态任务生成系统: </strong> 提供多样的任务类型，根据玩家行为和世界状态动态生成任务，确保游戏过程中的挑战性和变化性。</li>
+				</ul>
+			</p>
+			<button class="toggle-btn" onclick="toggleCategoryVisibility(this)">项目架构</button>
+			<div class="category">
+				<p>基础设施</p>
+				<ul>
+					<li><strong>游戏引擎:</strong> 使用Unity引擎作为游戏的基础开发平台，提供了渲染、物理、声音、动画等基础功能。</li>
+					<li><strong>工具集:</strong> 包括Unity内置的编辑器工具、Asset Store中的插件、自定义编辑器脚本等，用于简化游戏开发和管理。</li>
+				</ul>
+				<p >游戏逻辑</p>
+				<ul>
+					<li><strong>世界生成与地形编辑:</strong>  包括随机地图生成、地形修改、生物群落分布、资源分布等，确保每局游戏的世界都是独特的。</li>
+					<li><strong>物资合成及装备系统:</strong> 管理物品的获取、使用、丢弃，以及装备的穿戴、卸下，合成。</li>
+					<li><strong>玩家控制与角色系统:</strong> 实现玩家操作角色的移动、攻击、技能释放等功能，包括角色属性、状态机、动画控制等。</li>
+					<li><strong>经济与交易系统:</strong> 管理游戏中的货币系统、商店系统和交易机制。</li>
+				</ul>
+			
+				<p>互动系统</p>
+				<ul>
+					<li><strong>NPC系统:</strong> 设计和管理各种NPC，包括村民、商人、任务NPC等，实现与它们的对话、交易和任务接取。</li>
+					<li><strong>事件触发与反馈:</strong> 设计响应玩家行为的事件触发机制，如地图事件、天气变化、季节变迁等，增强游戏的动态性和互动性。</li>
+				</ul>
+			
+				<p>场景管理</p>
+				<ul>
+					<li><strong>区域管理与加载优化</strong>设计区域划分、加载优先级、远景与近景加载控制，提高游戏的性能和体验。</li>
+					<li><strong>地图与战斗场景:</strong>  管理地图的生成、战斗场景的布置与切换，确保每个场景都能完整呈现游戏的视觉和玩法特色。</li>
+				</ul>
+				
+				<p>用户体验</p>
+				<ul>
+					<li><strong>UI界面设计:</strong> 设计游戏的主界面、菜单、背包、设置等UI界面，以用户友好的方式展示游戏信息和功能。</li>
+					<li><strong>音效与背景音乐:</strong>添加游戏中的音效、背景音乐和音乐切换机制，增强游戏的氛围和沉浸感。</li>
+					<li><strong>交互设计与反馈:</strong> 设计用户操作的响应速度、动画效果、按钮反馈等，优化用户体验和操作流畅性。</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+</main>
+<footer>
+	<p>©*** 2024 个人网站. 版权所有.</p>
+</footer>
+
+<!-- 返回顶部按钮 -->
+<div id="back-to-top">&uarr;</div>
+        
+<script src="js/effect.js"></script>　
+<script src="js/projects.js"></script>　
+</body>
+</html>

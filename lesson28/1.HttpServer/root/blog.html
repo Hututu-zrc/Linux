@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客</title>
+   <link rel="stylesheet"  href="./css/blog.css">
+	<link rel="preload" href="contact.html" as="document">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html" >首页</a></li>
+                <li><a href="about.html" >关于我</a></li>
+                <li><a href="projects.html">项目</a></li>
+                <li class="dropdown">
+                    <a href="blog.html" >博客</a>
+                    <!-- 博客的二级菜单 -->
+                    <div class="dropdown-content">
+                        <a href="https://blog.csdn.net/zmj_1318506938?type=blog" target="_blank">CSDN</a>
+                        <a href="https://www.cnblogs.com/zmj-Metaverse" target="_blank">博客园</a>
+                    </div>
+                </li>
+                <li><a href="contact.html">联系我</a></li>
+                <li><a href="game1.html" >小游戏</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+		<div class="video-container">
+		    <video autoplay muted loop>
+		        <source src="vedio/Main.mp4" type="video/mp4">
+		    </video>
+		</div>
+		
+        <section>
+            <h2>博客</h2>
+			<div id="categories">
+					<button class="category-button" data-category="all">我的所有博客</button>
+					<button class="category-button" data-category="category1">数据结构-链表</button>
+					<button class="category-button" data-category="category2">数据结构-树</button>
+					<button class="category-button" data-category="category3">数据结构-图</button>
+			</div>
+			
+			
+            <div id="blog-posts">
+                <a href="https://blog.csdn.net/zmj_1318506938/article/details/129925969?spm=1001.2014.3001.5501">
+					<div class="card category1">
+					<img src="img/0428.gif"/>
+                    <h3>CSDN链表1</h3>
+                    <p>编写程序，利用malloc函数开辟动态存储单元，存放输入的3个整数，然后求这3个数中的最大值。</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129936687?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表2</h3>
+						<p>利用malloc函数开辟动态存储单元，存放输入的3个学生的信息，然后输出这3个学生的信息</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129936747?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表3</h3>
+						<p>创建一维动态数组，顺序存放输入的一批整数，求最大值</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129936934?spm=1001.2014.3001.5501">
+					<div class="card category1">
+					<img src="img/0428.gif"/>
+					<h3>CSDN链表4</h3>
+					<p>创建M×N的二维动态数组，存放输入的M×N个整数，然后求这M×N个数中的最大值</p>
+					
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129937005?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表5</h3>
+						<p>创建字符动态二维数组，顺序存放输入的一批字符串，然后求这批字符串的最大值</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129937081?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表6</h3>
+						<p>创建一维动态数组，顺序存放输入的一批学生数据，然后输出这批学生中分数最高的学生信息</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129937127?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表7</h3>
+						<p>编写程序输入n个整数链式存放并输出最大值</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129937270?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表9</h3>
+						<p>编写程序输入一批学生数据链式存放，然后输出这批学生中的分数最高的学生信息</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129937220?spm=1001.2014.3001.5501">
+					<div class="card category1">
+						<img src="img/0428.gif"/>
+						<h3>CSDN链表8</h3>
+						<p>编写程序输入n个字符串链式存放，每个字符串长度不超过20，输出最大字符串</p>
+					</div>
+				</a>
+				
+				
+				
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259185">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树1</h3>
+						<p>根据哈夫曼树构建哈夫曼编码</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259181">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树2</h3>
+						<p>构建哈夫曼树</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259180">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树3</h3>
+						<p>非递归实现二叉树的中序遍历</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259162">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树4</h3>
+						<p>非递归实现二叉树左右子树交换</p>
+					</div>
+				</a>
+				<a href="https://blog.csdn.net/zmj_1318506938/article/details/129937220?spm=1001.2014.3001.5501">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树5</h3>
+						<p>层次遍历二叉树</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259153">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树6</h3>
+						<p> 计算二叉树的高度、总节点个数和叶子节点个数</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259158">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树7</h3>
+						<p>递归实现二叉树左右子树交换</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259148">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树9</h3>
+						<p> 二叉树的顺序存储及基本操作</p>
+					</div>
+				</a>
+				
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259152">
+					<div class="card category2">
+						<img src="img/R-C.gif"/>
+						<h3>博客园树8</h3>
+						<p>先序遍历创建二叉链表存储的二叉树及遍历操作</p>
+					</div>
+				</a>
+				
+				
+				
+				
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259139">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图1</h3>
+						<p>求图（邻接矩阵存储）最短路径的狄克斯特拉算法</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259140">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图2</h3>
+						<p>求AOV网（邻接表存储）的拓扑排序算法</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259141">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图3</h3>
+						<p>求AOE网（邻接表存储）的关键路径算法</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259135">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图4</h3>
+						<p>图（邻接表）的广度遍历</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259133">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图5</h3>
+						<p>图（邻接表）的深度遍历</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259136">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图6</h3>
+						<p>求图（邻接矩阵存储）最小生成树的普里姆（Prim）算法</p>
+					</div>
+				</a>
+				<a href="https://www.cnblogs.com/zmj-Metaverse/articles/18259131">
+					<div class="card category3">
+						<img src="img/2112.gif"/>
+						<h3>博客园图7</h3>
+						<p> 图的邻接表存储及求邻接点操作</p>
+					</div>
+				</a>
+				
+                </div>
+        </section>
+    </main>
+	
+	<!-- 返回顶部按钮 -->
+	<div id="back-to-top">&uarr;</div>
+	
+    <footer>
+        <p>©*** 2024 个人网站. 版权所有.</p>
+    </footer>
+		<script src="js/effect.js"></script>
+		<script src="js/blog.js"></script>
+
+		
+</body>
+</html>

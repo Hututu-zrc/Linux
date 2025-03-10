@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>我的小游戏</title>
+   <link rel="stylesheet" href="./css/game1.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html" >首页</a></li>
+                <li><a href="about.html" >关于我</a></li>
+                <li><a href="projects.html" >项目</a></li>
+                <li class="dropdown">
+                    <a href="blog.html" >博客</a>
+                    <!-- 博客的二级菜单 -->
+                    <div class="dropdown-content">
+                        <a href="https://blog.csdn.net/zmj_1318506938?type=blog" target="_blank">CSDN</a>
+                        <a href="https://www.cnblogs.com/zmj-Metaverse" target="_blank">博客园</a>
+                    </div>
+                </li>
+                <li><a href="contact.html" >联系我</a></li>
+                <li><a href="game1.html">小游戏</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="video-container">
+        <video autoplay muted loop>
+            <source src="vedio/Main.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div id="game-container">
+        <div id="game-area"></div>
+        <div id="controls">
+            <button id="start-button">开始游戏</button>
+        </div>
+    </div>
+    <div id="custom-alert" class="custom-alert" style="display: none;">
+    	<h2>呆呆蛇游戏</h2>
+        <p>你点击“开始游戏”后可以看到呆呆蛇可以自动寻找食物，但是它可能会咬到自己或者反方向移动咬到自己，请你通过“WASD或者上下左右"键来帮助呆呆蛇寻找食物。</p>
+    	<button id="alert-ok-button" disabled>确定(<span id="countdown">5</span> 秒)</button>
+    </div>
+    <script src="js/game1.js"></script>
+	<script type="text/javascript" src="js/effect.js"></script>　　
+</body>
+</html>
+

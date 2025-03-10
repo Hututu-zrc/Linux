@@ -6,15 +6,17 @@
 #include <sstream>
 #include <fstream>
 #include <unordered_map>
+#include "Log.hpp"
 #include "Common.hpp"
 const std::string Sep = "\r\n";        // 行与行之间的分隔符
 const std::string LineSep = " ";       // 请求行里面的分隔符
 const std::string HeaderLineSep = ":"; // 请求报头的每行里面的分隔符key:value式的
 const std::string BlankLine = "\r\n";  // 空行
-const std::string DefaultHomePath = "wwwroot/";
+const std::string DefaultHomePath = "root/";
 const std::string http_version = "HTTP/1.0";
-const std::string page404 = "/404.html";
-const std::string firstpage="index.html";
+const std::string page404 = "wwwroot/404.html";
+const std::string firstpage = "index.html";
+using namespace LogModule;
 // B/S模式
 class HttpRequest
 {
@@ -40,19 +42,26 @@ public:
     // 需要拿到该uri下面的信息
     std::string GetContent()
     {
-        //暂时的做法
-        //读取图片信息的时候,可能发生'\0'截断了,导致前端显示不出来
+        // 暂时的做法
+        // 读取图片信息的时候,可能发生'\0'截断了,导致前端显示不出来
         std::string content;
         std::ifstream in(_uri);
         if (in.is_open() == false)
             return std::string();
-        std::string line;
-        while (std::getline(in, line))
-        {
-            content += line;
-        }
+        // std::string line;
+        // while (std::getline(in, line))
+        // {
+        //     content += line;
+        // }
+        // in.close();
+        // 理论上应该使用vector<char>来存的，但是不太方便
+        // 这里使用文件指针读取
+        in.seekg(0, in.end);
+        int filesize = in.tellg();
+        in.seekg(0, in.beg);
+        content.resize(filesize);
+        in.read((char *)content.c_str(), filesize);
         in.close();
-
         return content;
     }
     void Print()
@@ -79,27 +88,28 @@ public:
         _uri = number;
     }
 
-    std::string Suffix()
+    std::string Suffix() // 拿到请求的后缀名
     {
-        //uri ->wwwroot/index.html wwwroot/image/q.jpg wwwroot/login.html
-        auto pos=_uri.rfind(".");
-        if(pos==std::string::npos)   return std::string(".html");
-        else    return _uri.substr(pos);
+        // uri ->wwwroot/index.html wwwroot/image/q.jpg wwwroot/login.html
+        auto pos = _uri.rfind(".");
+        if (pos == std::string::npos)
+            return std::string(".html");
+        else
+            return _uri.substr(pos);
     }
-
-
-
-
 
     ~HttpRequest() {}
 
 private:
+    // 解析请求行的三个部分，放到对应的成员变量当中
     void PraseRequestLine(std::string &_req_line, const std::string sep)
     {
         std::stringstream ss(_req_line);
         ss >> _method >> _uri >> _version;
         _uri = DefaultHomePath + _uri;
     }
+
+    // 将请求报文里面的请求报头提取出来，kv结构放到map里面去
     bool ParseHeaderKv(std::vector<std::string> &_req_header)
     {
         for (auto &header : _req_header)
@@ -114,6 +124,8 @@ private:
         }
         return true;
     }
+
+    // 将请求报文里面的string类型的请求报头分割开来，放到_req_header里面去
     bool ParseHeader(std::string &request_str)
     {
         std::string line;
@@ -165,17 +177,21 @@ public:
     }
     void Build(HttpRequest &req)
     {
-        std::string uri=req.GetUrl();
-        if(uri.back()=='/') // wwwroot/ wwwroot/a/b/
+        // 首先从请求报文里面拿到对应的url路径
+        std::string uri = req.GetUrl();
+
+        // 判断路径，如果是默认路径直接变成index.html页面，然后重新设置到url里面
+        if (uri.back() == '/') // wwwroot/ wwwroot/a/b/
         {
-            uri+=firstpage;
+            uri += firstpage;
             req.SetUrl(uri);
         }
 
-        // 首先打开用户指定路径的文件，如果文件为空就判断
+        // 首先打开用户指定路径的文件，拿到对应的html文件内容
         _content = req.GetContent();
         if (_content.empty())
         {
+            LOG(LogLevel::DEBUG) << "404.html";
             // 用户请求资源的不存在
             // 1、首先设置状态码为404
             _status_code = 404;
@@ -186,28 +202,33 @@ public:
         }
         else
         {
-            // 请求的资源是存在的
+            // 请求的资源是存在的，设置对应的状态码
 
             _status_code = 200;
         }
+        // 设置请求码对应的请求描述
         _status_desc = CodeToDesc(_status_code);
-        if(!_content.empty())
-        {
-            SetHeader("Content-Length",std::to_string(_content.size()));
-        }
-        std::string mime_type=SuffixToDesc(req.Suffix());
-        SetHeader("Cotent_Type",mime_type);
 
-        for(auto&[k,v]:_header_kv)
+        // 如果html文件不为空，拿到里面的长度大小，设置相应报头里面的"内容长度字段"
+        if (!_content.empty())
         {
-            _resp_header.emplace_back(k+HeaderLineSep+v);
+            SetHeader("Content-Length", std::to_string(_content.size()));
+        }
+
+        // 设置响应报文里面的文件类型
+        std::string mime_type = SuffixToDesc(req.Suffix());
+        SetHeader("Cotent_Type", mime_type);
+
+        for (auto &[k, v] : _header_kv)
+        {
+            _resp_header.emplace_back(k + HeaderLineSep + v);
         }
     }
 
     void Serialize(std::string *resp_str)
     {
         // 首先构建的状态行
-        std::string _resp_line = _version + LineSep + std::to_string(_status_code) +LineSep + _status_desc + Sep;
+        std::string _resp_line = _version + LineSep + std::to_string(_status_code) + LineSep + _status_desc + Sep;
 
         *resp_str = _resp_line;
         for (auto &e : _resp_header)
@@ -219,11 +240,13 @@ public:
         *resp_str += _body;
     }
     ~HttpResponse() {}
-    void SetHeader(const std::string &k,const std::string &v)
+    void SetHeader(const std::string &k, const std::string &v)
     {
-        _header_kv[k]=v;
+        _header_kv[k] = v;
     }
+
 private:
+    // 将相应报文里面的状态码，设置对应的状态描述
     std::string CodeToDesc(int code)
     {
         switch (code)
@@ -232,16 +255,21 @@ private:
             return ("OK");
         case 404:
             return ("Not Found");
+        case 301:
+            return ("Moved Permanently");
+        case 302:
+            return ("See Other");
         default:
             return std::string();
         }
     }
 
+    // 拿到客户端请求的后缀名以后，设置对应的数据类型
     std::string SuffixToDesc(const std::string &suffix)
     {
-        if(suffix==".html")
+        if (suffix == ".html")
             return "text/html";
-        else if(suffix==".jpg")
+        else if (suffix == ".jpg")
             return "application/x-jpg";
         else
             return "text/html";
@@ -253,7 +281,7 @@ private:
     int _status_code;
     std::string _status_desc;
     std::string _content;
-    std::unordered_map<std::string ,std::string > _header_kv;
+    std::unordered_map<std::string, std::string> _header_kv;
     // 最终需要以下的四部分
     std::string _resp_line;                // 请求行
     std::vector<std::string> _resp_header; // 请求报头
