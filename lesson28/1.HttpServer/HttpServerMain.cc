@@ -7,6 +7,7 @@ void Login(HttpRequest &req, HttpResponse &resp)
     // 1、解析参数
     // 2、数据库核验用户是否合法
     // 3、返回响应报文
+    //这里的响应报文需要自己去组建
     std::string body =req.GetContent("wwwroot/success.html");
     resp.SetCode(200);
 
