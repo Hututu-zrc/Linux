@@ -1,10 +1,13 @@
 #pragma once
-
+#include <unordered_map>
+#include <functional>
 #include <memory>
 #include "TcpServer.hpp"
 #include "HttpProtocol.hpp"
 
 using namespace TcpServerModule;
+
+using http_handler_t = std::function<void(HttpRequest &, HttpResponse &)>;
 class HttpServer
 {
 
@@ -12,6 +15,16 @@ public:
     HttpServer(int port)
         : _tcsv(std::make_unique<TcpServer>(port))
     {
+    }
+
+    void Register(std::string funcname ,http_handler_t func)
+    {
+        _route[funcname]=func;
+    }
+    bool SafeCheck(const std::string service)
+    {
+        auto iter=_route.find(service);
+        return iter!=_route.end();
     }
     void Start()
     {
@@ -30,10 +43,26 @@ public:
         sockfd->Recv(&http_request); // 不做完整性分析，太麻烦，主要是了解http的过程即可
         HttpRequest req;
         req.Deserialize(http_request);
-        req.Print();
 
+        // 请求被分为两类
+        // 1、静态网页，请求一般的静态资源
+        // 2、提交擦书，携带参数，需要我们交互设置
         HttpResponse resp;
-        resp.Build(req);
+
+        if (req.IsHasArgs())
+        {
+            std::string service=req.GetPath();
+            if(SafeCheck(service))
+                _route[service](req,resp);
+            else
+                resp.Build(req);
+
+        }
+        else
+        {
+            req.Print();
+            resp.Build(req);
+        }
         std::string resp_str;
         resp.Serialize(&resp_str);
         sockfd->Send(resp_str);
@@ -63,4 +92,5 @@ public:
 
 private:
     std::unique_ptr<TcpServer> _tcsv;
+    std::unordered_map<std::string ,http_handler_t> _route;//功能路由
 };

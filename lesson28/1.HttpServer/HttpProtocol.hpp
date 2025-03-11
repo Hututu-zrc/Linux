@@ -12,7 +12,7 @@ const std::string Sep = "\r\n";        // 行与行之间的分隔符
 const std::string LineSep = " ";       // 请求行里面的分隔符
 const std::string HeaderLineSep = ":"; // 请求报头的每行里面的分隔符key:value式的
 const std::string BlankLine = "\r\n";  // 空行
-const std::string DefaultHomePath = "root/";
+const std::string DefaultHomePath = "wwwroot/";
 const std::string http_version = "HTTP/1.0";
 const std::string page404 = "wwwroot/404.html";
 const std::string firstpage = "index.html";
@@ -23,29 +23,54 @@ class HttpRequest
     // 在反序列化的过程中，细化我们解析出来的字段
 public:
     HttpRequest() {}
-
+    bool IsHasArgs()
+    {
+        return _isexec;
+    }
     // 反序列化就是按照分隔符将字符串打散
     void Deserialize(std::string &request_str)
     {
-
+        // 提取请求行里面的详细字段
         if (PraseOneLine(request_str, &_req_line, Sep))
         {
             PraseRequestLine(_req_line, LineSep);
             ParseHeader(request_str);
             _body = request_str;
         }
-        // 提取请求行里面的详细字段
+        if (_method == "POST")
+        {
+            _isexec = true;
+            _args = _body;
+            _path = _uri; // 后面解析的时候，需要用到path，这里也需要初始化一下
+            LOG(LogLevel::DEBUG) << "method: " << _method;
+
+            LOG(LogLevel::DEBUG) << "path: " << _path;
+            LOG(LogLevel::DEBUG) << "args: " << _args;
+        }
+        else if (_method == "GET")
+        {
+            auto pos = _uri.find("?");
+            if (pos != std::string::npos)
+            { // /login?username=zhangsan&passwd=123456
+                _isexec = true;
+                _path = _uri.substr(0, pos);
+                _args = _uri.substr(pos + 1);
+            }
+        }
     }
 
     // 打开用户指定的路径下面的信息
     // 用户指定的路径下，文件存储在我们的服务器上面
     // 需要拿到该uri下面的信息
-    std::string GetContent()
+
+    // 增加了动态交互的功能，此时的GetURL()是不带根目录的，是干净的返回信息
+    // 在Build里面才加上我们的固定前缀，也就是根目录
+    std::string GetContent(const std::string path)
     {
         // 暂时的做法
         // 读取图片信息的时候,可能发生'\0'截断了,导致前端显示不出来
         std::string content;
-        std::ifstream in(_uri);
+        std::ifstream in(path);
         if (in.is_open() == false)
             return std::string();
         // std::string line;
@@ -87,7 +112,14 @@ public:
     {
         _uri = number;
     }
-
+    std::string GetPath()
+    {
+        return _path;
+    }
+    std::string GetArgs()
+    {
+        return _args;
+    }
     std::string Suffix() // 拿到请求的后缀名
     {
         // uri ->wwwroot/index.html wwwroot/image/q.jpg wwwroot/login.html
@@ -106,7 +138,7 @@ private:
     {
         std::stringstream ss(_req_line);
         ss >> _method >> _uri >> _version;
-        _uri = DefaultHomePath + _uri;
+        _uri = _uri;
     }
 
     // 将请求报文里面的请求报头提取出来，kv结构放到map里面去
@@ -164,6 +196,11 @@ private:
     std::string _uri;                                 // 请求行的uri路径字段  用户需要的
     std::string _version;                             // 请求行的http版本字段
     std::unordered_map<std::string, std::string> map; // 用来记录请求报头里面的属性
+
+    std::string _path;
+    std::string _args;
+
+    bool _isexec = false;
 };
 
 // 对于http，任何的请求，都必须要有应答，没有正文的可以
@@ -178,7 +215,7 @@ public:
     void Build(HttpRequest &req)
     {
         // 首先从请求报文里面拿到对应的url路径
-        std::string uri = req.GetUrl();
+        std::string uri = DefaultHomePath + req.GetUrl();
 
         // 判断路径，如果是默认路径直接变成index.html页面，然后重新设置到url里面
         if (uri.back() == '/') // wwwroot/ wwwroot/a/b/
@@ -188,7 +225,7 @@ public:
         }
 
         // 首先打开用户指定路径的文件，拿到对应的html文件内容
-        _content = req.GetContent();
+        _content = req.GetContent(uri);
         if (_content.empty())
         {
             LOG(LogLevel::DEBUG) << "404.html";
@@ -198,7 +235,7 @@ public:
             // 2、将用户的uri改成我们的404.html页面的路径
             req.SetUrl(page404);
             // 4、返回404.html的内容
-            _content = req.GetContent();
+            _content = req.GetContent(page404);
         }
         else
         {
@@ -218,15 +255,17 @@ public:
         // 设置响应报文里面的文件类型
         std::string mime_type = SuffixToDesc(req.Suffix());
         SetHeader("Cotent_Type", mime_type);
+        _body = _content;
 
-        for (auto &[k, v] : _header_kv)
-        {
-            _resp_header.emplace_back(k + HeaderLineSep + v);
-        }
     }
 
     void Serialize(std::string *resp_str)
     {
+        //将map里面的内容组成键值对的形式，放到响应报头里面
+        for (auto &[k, v] : _header_kv)
+        {
+            _resp_header.emplace_back(k + HeaderLineSep + v);
+        }
         // 首先构建的状态行
         std::string _resp_line = _version + LineSep + std::to_string(_status_code) + LineSep + _status_desc + Sep;
 
@@ -236,10 +275,21 @@ public:
             *resp_str += e + Sep;
         }
         *resp_str += _blank_line;
-        _body = _content;
+        // _body = _content; 这里如果是方法，方法里面的body就会被覆盖掉
+
         *resp_str += _body;
     }
     ~HttpResponse() {}
+    void Setbody(const std::string body)
+    {
+        _body = body;
+    }
+    void SetCode(int code)
+    {
+        _status_code = code;
+        _status_desc = CodeToDesc(_status_code);
+    }
+
     void SetHeader(const std::string &k, const std::string &v)
     {
         _header_kv[k] = v;

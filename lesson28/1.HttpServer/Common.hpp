@@ -38,6 +38,8 @@ bool PraseOneLine(std::string &str, std::string *out, const std::string &sep)
     return true;
 }
 
+
+//分割请求报头里面的kv
 bool SplitString(std::string &header, std::string Sep, std::string *key, std::string *value)
 {
     auto pos = header.find(Sep);

@@ -26,6 +26,7 @@ namespace SocketModule
         virtual void SocketOrDie() = 0;
         virtual bool BindOrDie(int port) = 0;
         virtual bool ListenOrDie() = 0;
+        virtual void SetSocketOpt()=0;
         virtual SockPtr AcceptOrDie(Inet_addr *Out) = 0;
         virtual int Recv( std::string *In) = 0;
         virtual int Send(std::string &Out) = 0;
@@ -34,6 +35,7 @@ namespace SocketModule
         void BulidTcpServerMethod(int port)
         {
             SocketOrDie();
+            SetSocketOpt();
             BindOrDie(port);
             ListenOrDie();
         }
@@ -93,6 +95,15 @@ namespace SocketModule
             LOG(LogLevel::INFO) << "Listen success,sockfd: " << _sockfd;
             return true;
         }
+
+        virtual void SetSocketOpt()override
+        {
+            //保证服务器异常断开以后，还是可以直接立即重启的，不会有bind问题
+            int opt=1;
+            int n=::setsockopt(_sockfd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
+
+        }
+
 
         // accpet函数需要做到的
         // 1、返回TcpServer.hpp里面，给出nersockfd
