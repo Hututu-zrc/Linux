@@ -86,6 +86,7 @@ public:
                 buff[n] = 0;
                 // LOG(LogLevel::DEBUG)<<"buff: "<<buff;
                 
+                //保证tcp报文的完整性
                 package+=buff;
               
                 
