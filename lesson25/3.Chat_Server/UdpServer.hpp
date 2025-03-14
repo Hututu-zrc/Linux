@@ -127,7 +127,7 @@ public:
             socklen_t len = sizeof(peer);
 
             // 多个客户端的 UDP 报文同时到达服务器时，操作系统的网络栈会对这些报文进行排队处理。
-            // recvfrom 函数会按照队列的顺序依次处理每个报文，每次调用 recvfrom 都会接收一个完整的报文。具体过程如下：
+            //  recvfrom 函数会按照队列的顺序依次处理每个报文，每次调用 recvfrom 都会接收一个完整的报文。具体过程如下：
             //  报文排队：操作系统的网络接口接收到多个 UDP 报文后，会将它们放入一个接收队列中。
             //  依次处理：recvfrom 函数会从队列中取出一个报文进行处理，将其数据部分复制到缓冲区中，然后返回。之后再次调用 recvfrom 时，会从队列中取出下一个报文，如此循环。
             ssize_t n = recvfrom(_socket_fd, buff, sizeof(buff) - 1, 0, CONV(&peer), &len);
