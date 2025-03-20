@@ -38,6 +38,12 @@ namespace TcpServerModule
         {
             _handler=handler;
         }
+
+        //非常重要：这里为什么没有出现粘包问题
+        //主要原因就是基于http服务的请求-响应服务
+        //http每次发送一个请求，等待服务器响应了之后才会发送第二个请求
+        //所以，我们每次都只是接收一个http报文，不会出现粘包问题，只会有可能出现分包问题
+        //这里采取的是短连接的方式，每次处理完一个http报文就直接关闭掉，然后重新连接
         void Loop()
         {
             _isrunning = true;
@@ -55,6 +61,7 @@ namespace TcpServerModule
                 pid_t pid=fork();
                 if (pid == 0)
                 {
+                    //子进程会拷贝父进程的文件描述符表，这个文件描述符在父进程有用，子进程用不到
                     //关闭多余的文件描述符
                     _socket->Close();
                     //处理方法处理以后，返回信息
