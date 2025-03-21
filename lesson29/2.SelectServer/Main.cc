@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[])
 {
+    ENABLE_CONSOLE_LOG();
     if (argc != 2)
     {
         std::cout << "select_server + " << "port" << std::endl;
@@ -10,7 +11,7 @@ int main(int argc, char *argv[])
     }
     std::unique_ptr<SelectServer> ssvr = std::make_unique<SelectServer>(argv[1]);
     ssvr->Init();
-    ssvr->Start();
+    ssvr->Loop();
     return 0;
 }
 
