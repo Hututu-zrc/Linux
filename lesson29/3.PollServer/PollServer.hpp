@@ -95,7 +95,7 @@ PollServer(std::string port)
             // 证明当前的服务器select管理已达到上限
             LOG(LogLevel::ERROR) << "服务器连接已达到上限";
             //这里可以扩容，不过要修改成员变量，比如struct pollfd _sockfds改为strcut pollfd * _sockfd
-            //使用malloc扩容
+            //可以使用malloc扩容
             // 关闭文件描述符
             ::close(newfd);
         }
