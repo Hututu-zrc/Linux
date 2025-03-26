@@ -63,7 +63,7 @@ public:
                     // 将错误事件转换为读写事件//？？？？
                     revents = EPOLLIN | EPOLLOUT;
                 }
-                // 读事件，并且map里面存在这个连接
+                // 读事件，并且map里面存在这连接
                 if ((revents & EPOLLIN) && IsConnectionExists(sockfd))
                 {
                     _connections[sockfd]->CallRecv();
