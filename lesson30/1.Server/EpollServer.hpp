@@ -63,7 +63,7 @@ public:
             uint32_t revents = _rcev[i].events;
             if ((revents & EPOLLERR) || (revents & EPOLLHUP))
             {
-                // 将错误事件转换为读写事件//？？？？
+                // 将错误事件转换为读写事件//？？？
                 revents = EPOLLIN | EPOLLOUT;
             }
             // 读事件，并且map里面存在这连接
