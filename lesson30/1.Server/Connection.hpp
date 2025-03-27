@@ -6,25 +6,25 @@
 
 class EpollServer;
 // 把所有的文件描述符做一下封装
+// 将这个函数作为基类函数，原本的回调函数变成接口函数
 class Connection
 {
 public:
     using func_t = std::function<void()>;
     // 那么初始化的时候，就应该指明sockfd和关心的事件
-    Connection(int sockfd)
-        : _sockfd(sockfd),
+    Connection()
+        : _sockfd(-1),
           _events(0)
     {
     }
-
-
-    void Register(func_t recv, func_t send, func_t exception)
+    void SetEpollOwner(EpollServer *epollserver_ptr)
     {
-        _recv = recv;
-        _send = send;
-        _exception = exception;
+        _owner = epollserver_ptr;
     }
-
+    EpollServer *GetEpollOwner()
+    {
+        return _owner;
+    }
     void SetEvents(uint32_t events)
     {
         _events = events;
@@ -33,34 +33,26 @@ public:
     {
         return _events;
     }
+    void SetSockfd(int sockfd)
+    {
+        _sockfd = sockfd;
+    }
     int GetSockfd()
     {
         return _sockfd;
     }
-    void CallRecv()
-    {
-        _recv();
-    }
-    void CallSend()
-    {
-        _send();
-    }
-    void CallExcep()
-    {
-        _exception();
-    }
+    virtual void Recv() = 0;
+    virtual void Send() = 0;
+    virtual void Excep() = 0;
+    // virtual void Who()=0;
+
     ~Connection() {}
 
-private:
+protected:
     int _sockfd;
     std::string _inbuffer;  // 读取时候的输入缓冲区
     std::string _outbuffer; // 发生时候的输出缓冲区
     Inet_addr _peer_addr;   // 对应的哪一个客户端
-
-    // 回调方法
-    func_t _recv;
-    func_t _send;
-    func_t _exception;
 
     // 添加一个指针，表明该connection属于哪个epoll服务器
     EpollServer *_owner;

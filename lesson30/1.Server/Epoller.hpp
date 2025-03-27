@@ -18,10 +18,10 @@ namespace EpollerModule
                 Die(EPOLL_CREATE_ERR);
             }
             LOG(LogLevel::DEBUG) << "epoll_create success,fd" << _epfd;
+            return _epfd;
         }
-        int Wait(struct epoll_event rcev[], int recv_num)
+        int Wait(struct epoll_event rcev[], int recv_num,int timeout)
         {
-            int timeout = -1;
             int n = ::epoll_wait(_epfd, rcev, recv_num, timeout);
             if (n < 0)
             {
@@ -45,6 +45,7 @@ namespace EpollerModule
                 Die(EPOLL_CTL_ERR);
             }
             LOG(LogLevel::DEBUG) << "epoll_ctl success!";
+            return n;
         }
         ~Epoller() {}
 

@@ -27,7 +27,7 @@ namespace SocketModule
         virtual bool BindOrDie(int port) = 0;
         virtual bool ListenOrDie() = 0;
         virtual void SetSocketOpt() = 0;
-        virtual int AcceptOrDie(Inet_addr *Client) = 0;
+        virtual int AcceptOrDie(Inet_addr *Client,int *aerrno) = 0;
         virtual int Recv(std::string *In) = 0;
         virtual int Send(std::string &Out) = 0;
         virtual bool Close() = 0;
@@ -58,7 +58,10 @@ namespace SocketModule
                 LOG(LogLevel::FATAL) << strerror(errno);
                 Die(SOCKET_ERR);
             }
-            LOG(LogLevel::INFO) << strerror(errno);
+
+            SetNonBlock(_sockfd);
+
+            LOG(LogLevel::INFO) << "socket create success";
         }
         bool BindOrDie(int port) override
         {
@@ -108,15 +111,16 @@ namespace SocketModule
         // 2、返回client的信息
         // 这里不能直接返回int类型,所有的sockfd类型，除非是在Socket.hpp，也就是底层里面使用
         // 在上层使用的时候，统一返回封装着sockfd的Socket类型
-        int AcceptOrDie(Inet_addr *Client) override
+        int AcceptOrDie(Inet_addr *Client,int *out_errno) override
         {
             struct sockaddr_in client;
             socklen_t socklen = sizeof(client);
             int newsockfd = ::accept(_sockfd, CONV(&client), &socklen);
+            *out_errno=errno;
             if (newsockfd < 0)
             {
-                LOG(LogLevel::FATAL) << strerror(errno);
-                Die(ACCEPT_ERR);
+                LOG(LogLevel::FATAL) <<"socket accept done";
+                // Die(ACCEPT_ERR);
             }
             Client->SetAddr(client, socklen);
             LOG(LogLevel::INFO) << "Accept success,newsockfd: " << newsockfd;
