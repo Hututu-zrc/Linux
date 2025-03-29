@@ -50,3 +50,33 @@ public:
 
 private:
 };
+
+
+std::string HandlerRequest(std::string &inbuffer)
+{
+    std::string context; // Decode解析以后，拿到的完整报文的数据部分
+
+    std::string result_str; // 最后接收到的所有报文经过处理后，返回的结果报文
+    while (Decode(inbuffer, &context))
+    {
+        if (context.empty())
+            return std::string();
+        // 1、反序列化
+        Request req;
+        req.Deserialize(context);
+
+        // 2、应用层处理
+        Calculator cal;
+        Response resp = cal.Execute(req);
+
+        // 3、序列化
+        std::string ret_mes;
+        resp.Serialize(ret_mes);
+
+        // 4、合成报文Encode
+        Encode(ret_mes);
+        // 5、返回
+        result_str += ret_mes;
+    }
+    return result_str;
+}
