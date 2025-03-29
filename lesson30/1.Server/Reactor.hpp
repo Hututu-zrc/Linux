@@ -14,7 +14,12 @@ using namespace SocketModule;
 #define MAX 4096
 const int gdefaultfd = -1;
 using connection_t = std::shared_ptr<Connection>;
-class EpollServer // epollserver只关心connection
+
+// 这里是事件驱动的模式，将IO事件的响应和处理进行分离
+/// 通过创建Epoll模型，得到epfd文件描述符，然后通过epoll模型去监听多个IO源上的事件
+// 比如listensockfd，普通的连接fd等
+// 这种架构模式叫做反应堆模式
+class Reactor // epollserver只关心connection
 {
     static const int RECV_NUM = 64;
 
@@ -27,7 +32,7 @@ private:
     struct epoll_event _rcev[RECV_NUM];                 // epoller里面的wait函数所需要的事件数组
 
 public:
-    EpollServer()
+    Reactor()
         : _epoll(std::make_unique<Epoller>()),
           _isrunning(false)
     {
@@ -97,7 +102,7 @@ public:
         _isrunning = false;
     }
 
-    ~EpollServer() {}
+    ~Reactor() {}
 };
 // void Init()
 // {

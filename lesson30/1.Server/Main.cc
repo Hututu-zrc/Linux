@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "Listener.hpp"
-#include "EpollServer.hpp"
+#include "Reactor.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     std::shared_ptr<Connection> conn = std::make_shared<Listener>(port);
 
     // 主函数当中插入listensockfd的connection，然后插入到EpollServer的map里面去
-    std::unique_ptr<EpollServer> ssvr = std::make_unique<EpollServer>();
+    std::unique_ptr<Reactor> ssvr = std::make_unique<Reactor>();
     // conn->SetEpollOwner(ssvr.get());
 
     ssvr->Init();

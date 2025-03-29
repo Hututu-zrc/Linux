@@ -27,7 +27,7 @@ namespace SocketModule
         virtual bool BindOrDie(int port) = 0;
         virtual bool ListenOrDie() = 0;
         virtual void SetSocketOpt() = 0;
-        virtual int AcceptOrDie(Inet_addr *Client,int *aerrno) = 0;
+        virtual int AcceptOrDie(Inet_addr *Client,int *out_errno)= 0;
         virtual int Recv(std::string *In) = 0;
         virtual int Send(std::string &Out) = 0;
         virtual bool Close() = 0;
@@ -58,7 +58,7 @@ namespace SocketModule
                 LOG(LogLevel::FATAL) << strerror(errno);
                 Die(SOCKET_ERR);
             }
-
+            //直接将listensockfd设置成为非阻塞的
             SetNonBlock(_sockfd);
 
             LOG(LogLevel::INFO) << "socket create success";

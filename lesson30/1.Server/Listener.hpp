@@ -5,9 +5,10 @@
 #include "Socket.hpp"
 #include "Connection.hpp"
 #include "IOService.hpp"
+#include "Protocol.hpp"
 
 using namespace SocketModule;
-#include "EpollServer.hpp"
+#include "Reactor.hpp"
 // 专门负责获取链接的模块
 // 将子类Listener继承父类的Connection
 // 这样Listener后续使用就比较方便
@@ -20,6 +21,7 @@ public:
         : _port(port),
           _listensock(std::make_unique<TcpSocket>())
     {
+        // BuildTcpServerMethod函数里面就已经设置为非阻塞了
         _listensock->BulidTcpServerMethod(_port);
 
         // 设置父类里面的函数成员变量
@@ -52,13 +54,15 @@ public:
                 // 这里另外写一个类，去实现普通的文件描述符的插入IOService
 
                 // 1.设置为非阻塞的文件描述符
-                SetNonBlock(sockfd);
+                //   SetNonBlock(sockfd);
                 // 2.将sockfd构建为connection
                 auto conn = std::make_shared<IOService>(sockfd);
+                conn->RegisterOnMeassage(HandlerRequest);
+
                 // 3.注册到Epoll里面，使用回调指针
                 // listensockfd执行InsertConnection的时候，就已经设置了EpollServer的指针
                 GetEpollOwner()->InsertConnection(conn);
-                LOG(LogLevel::DEBUG)<<"Add Connection Success!";
+                LOG(LogLevel::DEBUG) << "Add Connection Success!";
             }
             else
             {
@@ -88,9 +92,9 @@ public:
     void Excep() override
     {
     }
-    void Who() 
+    void Who()
     {
-        std::cout<<"i am listener"<<std::endl;
+        std::cout << "i am listener" << std::endl;
     }
     ~Listener() {}
 
