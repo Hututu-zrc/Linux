@@ -43,7 +43,7 @@ public:
                 buff[n] = 0;
                 Append(buff);
             }
-            else if (n == 0) // 对方关闭连接，这里全部转换到Excep里面，统一处理异常
+            else if (n == 0) // 对方关闭连接，这里全部转换到Excep里，统一处理异常
             {
                 Excep();
                 return;
