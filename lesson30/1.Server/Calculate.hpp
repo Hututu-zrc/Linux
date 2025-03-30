@@ -51,7 +51,6 @@ public:
 private:
 };
 
-
 std::string HandlerRequest(std::string &inbuffer)
 {
     std::string context; // Decode解析以后，拿到的完整报文的数据部分
@@ -63,8 +62,11 @@ std::string HandlerRequest(std::string &inbuffer)
             return std::string();
         // 1、反序列化
         Request req;
-        req.Deserialize(context);
-
+        if (!req.Deserialize(context))
+            break;
+        std::cout << "#############" << std::endl;
+        req.Print();
+        std::cout << "#############" << std::endl;
         // 2、应用层处理
         Calculator cal;
         Response resp = cal.Execute(req);

@@ -3,6 +3,8 @@
 #include <memory>
 #include <sys/epoll.h>
 #include "Socket.hpp"
+#include "Reactor.hpp"
+
 #include "Connection.hpp"
 using namespace SocketModule;
 
@@ -21,6 +23,8 @@ public:
     {
         // 1.设置为非阻塞的文件描述符
         SetNonBlock(sockfd);
+
+        // 这两个是设置Connection里面的属性
         SetSockfd(_sockfd);
         SetEvents(EPOLLIN | EPOLLET);
     }
@@ -39,7 +43,7 @@ public:
                 buff[n] = 0;
                 Append(buff);
             }
-            else if (n == 0) // 没有数据读了，这里全部转换到Excep里面，统一处理异常
+            else if (n == 0) // 对方关闭连接，这里全部转换到Excep里面，统一处理异常
             {
                 Excep();
                 return;
@@ -51,7 +55,7 @@ public:
                     // 本轮缓冲区数据全部读完了
                     break;
                 }
-                else if (errno == EINTR) // 用户退出
+                else if (errno == EINTR) // 此时被信号中断
                 {
                     continue;
                 }
@@ -70,11 +74,15 @@ public:
         {
             result = _onmessage(GetInBuffer());
         }
+        LOG(LogLevel::DEBUG) << "result: " << result;
         // 添加应答信息
         SetOutBuffer(result);
         if (!GetOutBuffer().empty())
         {
+            // 方案1：直接send
             Send();
+            // 方案2：打开对写事件的关注
+            // GetEpollOwner()->ModifyConnection(_sockfd, true, true);
         }
     }
     void Send() override
@@ -113,19 +121,30 @@ public:
                     return;
                 }
             }
-            if(!GetOutBuffer().empty())
-            { 
-                // 这里就需要使用epoll，像epoll里面注册写事件
 
+            // 这里的if判断就是从我们自己的缓冲区写入到内核缓冲区的过程当中，内核缓冲区写满了
+            // 这里时候outbuffer里面就还有数据，这个时候就注册写事件的读取
+            if (!GetOutBuffer().empty())
+            {
+
+                // 这里不应该这样写，应该在reactor里面去修改conn
+                //  SetEvents(EPOLLIN |EPOLLOUT|EPOLLET);
+                GetEpollOwner()->ModifyConnection(_sockfd, true, true);
             }
-            // 创建连接
-
-            // 注册
+            else
+            {
+                // 当前面的outbuffer数据全部写入内核缓冲区的时候，就需要修改对于写事件的读取
+                // 因为epoll里面读事件属于常驻，写事件是按需读取，这里就要把之前的写事件关闭掉
+                GetEpollOwner()->ModifyConnection(_sockfd, true, false);
+            }
         }
     }
     void Excep() override
     {
         // IO读取的时候，发生的异常，全部进入到Excep异常函数
+        // 异常函数的主要功能就是写入日志，差错处理，关闭连接，reactor异常connection，移出对于fd的事件的关心
+        LOG(LogLevel::INFO) << "客户端连接结束，异常处理: " << _sockfd;
+        GetEpollOwner()->DeleteConnection(_sockfd);
     }
     void RegisterOnMeassage(func_t onmessage)
     {

@@ -24,6 +24,7 @@ public:
     {
         return _owner;
     }
+
     void SetEvents(uint32_t events)
     {
         _events = events;
@@ -42,23 +43,23 @@ public:
     }
     void Append(const std::string &str)
     {
-        _inbuffer+=str;
+        _inbuffer += str;
     }
     void SetOutBuffer(std::string out_buffer)
     {
-        _outbuffer=out_buffer;
+        _outbuffer = out_buffer;
     }
-    std::string& GetInBuffer()
+    std::string &GetInBuffer()
     {
         return _inbuffer;
     }
-    std::string& GetOutBuffer()
+    std::string &GetOutBuffer()
     {
         return _outbuffer;
     }
     void DiscardOutBuffer(int num)
     {
-        _outbuffer.erase(0,num);
+        _outbuffer.erase(0, num);
     }
     virtual void Recv() = 0;
     virtual void Send() = 0;

@@ -42,7 +42,29 @@ public:
     {
         _epoll->Create();
     }
+    void DeleteConnection(int sockfd)
+    {
+        if (IsConnectionExists(sockfd) == true)
+        {
 
+            // 删除内核里面的连接
+            _epoll->Ctl(EPOLL_CTL_DEL, sockfd, _connections[sockfd]->GetEvents());
+
+            // 关闭文件描述符
+            ::close(sockfd);
+            // 删除map里面的连接
+            _connections.erase(sockfd);
+        }
+    }
+    void ModifyConnection(int sockfd, bool read_flag, bool write_flag)
+    {
+        if (IsConnectionExists(sockfd) == true)
+        {
+            uint32_t event = (read_flag ? EPOLLIN : 0) | (write_flag ? EPOLLOUT : 0) | EPOLLET;
+            _connections[sockfd]->SetEvents(event);
+            _epoll->Ctl(EPOLL_CTL_MOD, sockfd, _connections[sockfd]->GetEvents());
+        }
+    }
     // 对连接做的增删改查，这里是增加
     void InsertConnection(connection_t conn)
     {
