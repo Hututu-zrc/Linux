@@ -28,7 +28,7 @@ int main()
     else if (pid == 0) // 子进程实现写操作
     {
 
-        ::close(fds[0]);
+        ::close(fds[0]);//关闭读端
         int cnt = 0;
 
         while (cnt <10)
@@ -44,7 +44,7 @@ int main()
     }
     else // 父进程实现读操作
     {
-        ::close(fds[1]);
+        ::close(fds[1]);//关闭写端
 
         char buf[1024];
 

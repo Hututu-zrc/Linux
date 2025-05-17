@@ -3,7 +3,7 @@
 
 int main()
 {
-    FILE *fpw = fopen("bite.txt", "w");
+    FILE *fpw = fopen("zrctest.txt", "w");
     if (fpw == NULL)
     {
         perror("fopen");
@@ -12,7 +12,7 @@ int main()
     char *strw = "linux so easy!";
     fwrite(strw, sizeof(char), strlen(strw), fpw);
     fclose(fpw);
-    FILE *fpr = fopen("bite.txt", "r");
+    FILE *fpr = fopen("zrctest.txt", "r");
     if (fpr == NULL)
     {
         perror("fopen");

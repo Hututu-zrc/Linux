@@ -8,7 +8,7 @@
 #include <vector>
 
 using namespace std;
-vector<int> data;
+vector<int> datas;
 
 enum{
 	OK=0,
@@ -27,7 +27,7 @@ int  Save()
 	}
 	else
 	{
-		for(const auto & e:data)
+		for(const auto & e:datas)
 		{
 			fputs(to_string(e).c_str(),fp);
 			fputs(" ",fp);
@@ -44,7 +44,7 @@ int main()
 	int cnt=0;
 	while(true)
 	{
-		data.push_back(cnt);
+		datas.push_back(cnt);
 		cnt+=2;
 		if(cnt%10==0)
 		{

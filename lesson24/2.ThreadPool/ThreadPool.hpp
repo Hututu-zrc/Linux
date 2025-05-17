@@ -16,7 +16,7 @@ using namespace ThreadModule;
 
 namespace ThreadPoolModule
 {
-    const static int defaultnum = 5;
+    static const int defaultnum = 5;
 
     template <typename T>
     class Threadpool
@@ -81,7 +81,7 @@ namespace ThreadPoolModule
                 _threads.push_back(std::make_shared<Thread>(std::bind(&Threadpool::ExecuteTask, this, std::placeholders::_1)));
             }
         }
-
+        // 万能引用
         void Equeue(T &&t) // 任务进入队列的函数
         {
             // 这个地方要访问临界资源，所以要加锁保护

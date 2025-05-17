@@ -34,7 +34,7 @@ namespace MutexModule
     class LockGuard
     {
     public:
-        LockGuard(MutexMudole::Mutex &mutex) : _mutex(mutex)
+        LockGuard(MutexModule::Mutex &mutex) : _mutex(mutex)
         {
             _mutex.lock();
         }
@@ -44,7 +44,7 @@ namespace MutexModule
         }
 
     private:
-        MutexMudole::Mutex &_mutex;
+        MutexModule::Mutex & _mutex;
     };
 
 }

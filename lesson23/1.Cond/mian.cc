@@ -31,7 +31,6 @@ int main()
 
     pthread_create(&td1, nullptr, routine, (void *)"thread_1");
     pthread_create(&td2, nullptr, routine, (void *)"thread_2");
-
     while (true)
     {
         cnt++;

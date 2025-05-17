@@ -1,12 +1,10 @@
 #include "ProcessPool.hpp"
 #include "Task.hpp"
 
-
 void Usage()
 {
     std::cout << "augment" << " augment_num" << std::endl;
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +19,7 @@ int main(int argc, char *argv[])
     std::vector<Channel> channels; // 用来记录每个管道
 
     // 1、初始化进程池
-    ProcessPool *pp=new ProcessPool(num,Worker);
+    ProcessPool *pp = new ProcessPool(num, Worker);
     pp->InitProcessPool();
     // DebugChannel(channels);
 
