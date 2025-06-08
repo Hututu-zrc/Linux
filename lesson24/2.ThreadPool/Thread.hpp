@@ -5,8 +5,7 @@
 #include <string>
 #include <functional>
 
-
-//v1
+// v1
 namespace ThreadModule
 {
     static int count = 0;
@@ -25,14 +24,14 @@ namespace ThreadModule
         static void *Routine(void *args) // 用来调用用户传入的函数
         {
             Thread *t = static_cast<Thread *>(args);
-            t->_func( t->_name);
+            t->_func(t->_name);
             t->_status = RUNNING;
             return nullptr;
         }
 
-         void EnableDetach()//更改线程是否可以分离
+        void EnableDetach() // 更改线程是否可以分离
         {
-            _joinable=false;
+            _joinable = false;
         }
 
     public:
@@ -45,8 +44,7 @@ namespace ThreadModule
         {
             if (_status != RUNNING)
             {
-
-                int n = ::pthread_create(&_tid, nullptr, Routine, this);//这里传入this指针参数
+                int n = ::pthread_create(&_tid, nullptr, Routine, this); // 这里传入this指针参数
                 if (n != 0)
                     return false;
                 return true;
@@ -81,8 +79,10 @@ namespace ThreadModule
             EnableDetach();
             ::pthread_detach(_tid);
         }
-        bool IsJoinable()//返回_joinable的属性
-        {return _joinable;}
+        bool IsJoinable() // 返回_joinable的属性
+        {
+            return _joinable;
+        }
 
         std::string GetName()
         {
@@ -101,8 +101,6 @@ namespace ThreadModule
         ThreadStauts _status; // 用来保存我们线程的状态
     };
 }
-
-
 
 // // v2 可以传入单参数的版本
 // namespace ThreadModule
@@ -205,4 +203,3 @@ namespace ThreadModule
 //         T _data;
 //     };
 // }
-

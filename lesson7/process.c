@@ -15,7 +15,7 @@ void Process(double total,double current)
 	}
 
 
-	//打印
+	//打印 左对齐100个字符，不足用空格填充，打印速率，打印等待字符
 	printf("[%-100s][%.1f%%][%c]\r",buf,rate,label[(int)rate%4]);
 	fflush(stdout);
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 int main()
 {
 	//chdir("/home/ZRC/linux");
@@ -17,6 +18,8 @@ int main()
 		if(id>0)
 		{
 			printf("this is Father Process:  PID:%d   PPID:%d   ID:%d  \n",getpid(),getppid(),id);
+			int n=wait(NULL);
+			if(n>0)	printf("成功回收子进程");
 			sleep(1);
 		}
 		else if (id==0)

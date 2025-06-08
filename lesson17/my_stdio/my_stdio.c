@@ -60,7 +60,26 @@ void mfflush(file*stream)
 		stream->size=0;//刷新完了以后size为0
 	}
 }
-size_t mfread(void *ptr, size_t size, file *stream);
+size_t mfread(void *ptr, size_t size, file *stream)
+{
+	if(stream->size<size)
+	{
+		memcpy(ptr,stream->buffer,stream->size);
+		size_t ret_size=stream->size;;
+		stream->size=0;
+		memset(stream->buffer,0,ret_size);
+		return ret_size;
+	}
+	else
+	{
+		memcpy(ptr,stream->buffer,size);
+		stream->size-=size;
+		//将剩下的size个字符移动到开头
+		memmove(stream->buffer,stream->buffer+size,stream->size);
+		return size;
+	}
+	return 0;
+}
 
 void mfclose(file *stream)
 {

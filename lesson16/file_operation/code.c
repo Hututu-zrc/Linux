@@ -30,9 +30,9 @@ int main(int argc,char *argv[])
 	//printf("buf:%d\n",strlen(buf));
 	
 	char buf[1024];
-	ssize_t rret=read(0,buf,sizeof(buf)-1);
+	ssize_t rret=read(0,buf,sizeof(buf)-1);//键盘输入
 	printf("rret:%d\n",rret);
-	ssize_t ret=write(1,buf,strlen(buf));
+	ssize_t ret=write(1,buf,strlen(buf));//屏幕输出
 	printf("ret:%d\n",ret);
 	printf("fd:%d\n",fd);
 	close(fd);
